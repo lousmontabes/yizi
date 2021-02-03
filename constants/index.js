@@ -1,3 +1,3 @@
-const confirmDistance = 200;
+const confirmDistance = 150;
 
 export { confirmDistance };
