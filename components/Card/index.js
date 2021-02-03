@@ -2,12 +2,23 @@ import React from "react";
 import { SafeAreaView, View, StyleSheet, Text } from "react-native";
 
 const Card = (props) => {
-  const { title, description } = props;
+  const { title, description, color } = props;
 
+  const textColor = color.interpolate({
+    inputRange: [0, 100],
+    outputRange: ["rgba(255, 0, 0, 1)", "rgba(0, 255, 0, 1)"],
+  });
+
+  console.log(textColor.__getValue());
+
+  const titleStyle = {
+    ...StyleSheet.flatten(styles.title),
+    color: textColor.__getValue(),
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={titleStyle}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </View>
     </SafeAreaView>

@@ -33,6 +33,7 @@ const Pile = (props) => {
   const pan = useRef(new Animated.ValueXY()).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const emptyMessageOpacity = useRef(new Animated.Value(0)).current;
+  const cardColor = useRef(new Animated.Value(0)).current;
 
   let prevD = 0;
 
@@ -42,7 +43,14 @@ const Pile = (props) => {
       const { dx, dy } = gestureState;
       const d = Math.sqrt(dx * dx + dy * dy);
 
-      d > confirmDistance && prevD < confirmDistance && Haptics.impactAsync();
+      if (d > confirmDistance && prevD < confirmDistance) {
+        //Haptics.impactAsync();
+        Animated.timing(cardColor, {
+          toValue: 100,
+          duration: 100,
+          useNativeDriver: true,
+        }).start();
+      }
 
       prevD = d;
 
@@ -105,7 +113,11 @@ const Pile = (props) => {
           }}
           {...panResponder.panHandlers}
         >
-          <Card title={card.title} description={card.description}></Card>
+          <Card
+            title={card.title}
+            description={card.description}
+            color={cardColor}
+          ></Card>
         </Animated.View>
       </View>
       <Animated.View
