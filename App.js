@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState, createRef } from "react";
 import { StatusBar } from "expo-status-bar";
-import { View, StyleSheet, Image, Text } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Header, Icon } from "react-native-elements";
+import * as Haptics from "expo-haptics";
+
 import Pile from "./components/Pile";
+import CreateView from "./components/CreateView";
 
 const cards = [
   { title: "桌子 Zhuōzi", description: "Table" },
@@ -12,6 +15,10 @@ const cards = [
 ];
 
 const App = () => {
+  const [showCreateView, setShowCreateView] = useState(false);
+
+  const textInputRef = createRef();
+
   return (
     <SafeAreaProvider>
       <Header
@@ -33,8 +40,16 @@ const App = () => {
         size={28}
         type="feather"
         name="edit-2"
-        onPress={() => console.log("hello")}
+        onPress={() => {
+          Haptics.notificationAsync();
+          setShowCreateView(true);
+          textInputRef.current.focus();
+        }}
       />
+      {/* <CreateView
+        show={showCreateView}
+        textInputRef={textInputRef}
+      ></CreateView> */}
       <StatusBar barStyle="default" />
     </SafeAreaProvider>
   );

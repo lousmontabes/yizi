@@ -7,7 +7,10 @@ import {
   Text,
   Image,
 } from "react-native";
+import * as Haptics from "expo-haptics";
+
 import Card from "../Card";
+import { confirmDistance } from "../../constants";
 
 const EmptyMessage = () => {
   return (
@@ -31,23 +34,27 @@ const Pile = (props) => {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const emptyMessageOpacity = useRef(new Animated.Value(0)).current;
 
+  let prevD = 0;
+
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
-    onPanResponderMove: Animated.event(
-      [
-        null,
-        {
-          dx: pan.x, // x,y are Animated.Value
-          dy: pan.y,
-        },
-      ],
-      { useNativeDriver: false }
-    ),
+    onPanResponderMove: (e, gestureState) => {
+      const { dx, dy } = gestureState;
+      const d = Math.sqrt(dx * dx + dy * dy);
+
+      d > confirmDistance && prevD < confirmDistance && Haptics.impactAsync();
+
+      prevD = d;
+
+      Animated.event([null, { dx: pan.x, dy: pan.y }], {
+        useNativeDriver: false,
+      })(e, gestureState);
+    },
     onPanResponderRelease: () => {
       const x = pan.x._value;
       const y = pan.y._value;
       const d = Math.sqrt(x * x + y * y);
-      if (d < 200) {
+      if (d < confirmDistance) {
         Animated.spring(
           pan, // Auto-multiplexed
           { toValue: { x: 0, y: 0 }, useNativeDriver: true } // Back to zero
