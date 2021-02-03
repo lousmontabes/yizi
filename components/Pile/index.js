@@ -44,11 +44,17 @@ const Pile = (props) => {
       const d = Math.sqrt(dx * dx + dy * dy);
 
       if (d > confirmDistance && prevD < confirmDistance) {
-        //Haptics.impactAsync();
+        Haptics.impactAsync();
         Animated.timing(cardColor, {
-          toValue: 100,
+          toValue: dy > 0 ? 100 : -100,
           duration: 100,
-          useNativeDriver: true,
+          useNativeDriver: false,
+        }).start();
+      } else if (d < confirmDistance && prevD > confirmDistance) {
+        Animated.timing(cardColor, {
+          toValue: 0,
+          duration: 100,
+          useNativeDriver: false,
         }).start();
       }
 
@@ -74,7 +80,7 @@ const Pile = (props) => {
             toValue: { x: 0, y: y > 0 ? 1000 : -1000 },
             duration: 150,
             useNativeDriver: true,
-          } // Back to zero
+          }
         ).start(() => {
           showNextCard();
         });
@@ -85,6 +91,7 @@ const Pile = (props) => {
   const showNextCard = () => {
     pan.setValue({ x: 0, y: 0 });
     fadeAnim.setValue(0);
+    cardColor.setValue(0);
 
     if (cards.length > 0) {
       setCard(cards.pop());

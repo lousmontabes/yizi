@@ -1,25 +1,38 @@
 import React from "react";
-import { SafeAreaView, View, StyleSheet, Text } from "react-native";
+import { Animated, SafeAreaView, View, StyleSheet, Text } from "react-native";
 
 const Card = (props) => {
   const { title, description, color } = props;
 
+  // TODO: Move this to constants
+  const colors = {
+    green: "rgba(116, 198, 157, 1)",
+    black: "rgba(0, 0, 0, 1)",
+    red: "rgba(217, 119, 119, 1)",
+  };
+
   const textColor = color.interpolate({
-    inputRange: [0, 100],
-    outputRange: ["rgba(255, 0, 0, 1)", "rgba(0, 255, 0, 1)"],
+    inputRange: [-100, 0, 100],
+    outputRange: [colors.red, colors.black, colors.green],
   });
 
   console.log(textColor.__getValue());
 
   const titleStyle = {
     ...StyleSheet.flatten(styles.title),
-    color: textColor.__getValue(),
+    color: textColor,
   };
+
+  const descriptionStyle = {
+    ...StyleSheet.flatten(styles.description),
+    color: textColor,
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
-        <Text style={titleStyle}>{title}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Animated.Text style={titleStyle}>{title}</Animated.Text>
+        <Animated.Text style={descriptionStyle}>{description}</Animated.Text>
       </View>
     </SafeAreaView>
   );
