@@ -16,8 +16,6 @@ const Card = (props) => {
     outputRange: [colors.red, colors.black, colors.green],
   });
 
-  console.log(textColor.__getValue());
-
   const titleStyle = {
     ...StyleSheet.flatten(styles.title),
     color: textColor,

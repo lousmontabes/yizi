@@ -41,7 +41,8 @@ const Pile = (props) => {
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
       const { dx, dy } = gestureState;
-      const d = Math.sqrt(dx * dx + dy * dy);
+      //const d = Math.sqrt(dx * dx + dy * dy);
+      const d = Math.abs(dy);
 
       if (d > confirmDistance && prevD < confirmDistance) {
         Haptics.impactAsync();
@@ -67,7 +68,9 @@ const Pile = (props) => {
     onPanResponderRelease: () => {
       const x = pan.x._value;
       const y = pan.y._value;
-      const d = Math.sqrt(x * x + y * y);
+      //const d = Math.sqrt(x * x + y * y);
+      const d = Math.abs(y);
+
       if (d < confirmDistance) {
         Animated.spring(
           pan, // Auto-multiplexed
