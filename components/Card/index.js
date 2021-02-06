@@ -2,7 +2,7 @@ import React from "react";
 import { Animated, SafeAreaView, View, StyleSheet, Text } from "react-native";
 
 const Card = (props) => {
-  const { title, description, color } = props;
+  const { title, subtitle, color } = props;
 
   // TODO: Move this to constants
   const colors = {
@@ -30,7 +30,7 @@ const Card = (props) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
         <Animated.Text style={titleStyle}>{title}</Animated.Text>
-        <Animated.Text style={descriptionStyle}>{description}</Animated.Text>
+        <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
       </View>
     </SafeAreaView>
   );

@@ -25,10 +25,10 @@ const EmptyMessage = () => {
 };
 
 const Pile = (props) => {
-  const initialState = { title: "椅子 Yǐzi", description: "Chair" };
-  const [card, setCard] = useState(initialState);
-
   const { cards } = props;
+
+  const initialState = { title: "椅子 Yǐzi", subtitle: "Chair" };
+  const [card, setCard] = useState(initialState);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -45,7 +45,7 @@ const Pile = (props) => {
       const d = Math.abs(dy);
 
       if (d > confirmDistance && prevD < confirmDistance) {
-        Haptics.impactAsync();
+        Haptics.selectionAsync();
         Animated.timing(cardColor, {
           toValue: dy > 0 ? 100 : -100,
           duration: 100,
@@ -125,7 +125,7 @@ const Pile = (props) => {
         >
           <Card
             title={card.title}
-            description={card.description}
+            subtitle={card.subtitle}
             color={cardColor}
           ></Card>
         </Animated.View>
