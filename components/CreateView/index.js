@@ -132,7 +132,7 @@ const CreateView = (props) => {
     subtitleInputRef.current.focus();
   };
 
-  onInputSubtitle = (text) => {
+  const onInputSubtitle = (text) => {
     // Remove user-input line breaks
     setSubtitle(text.replace("\n", " "));
   };

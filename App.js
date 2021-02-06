@@ -5,7 +5,7 @@ import { getData, clear } from "./utils/storage";
 const App = () => {
   const [cards, setCards] = useState([]);
 
-  loadItems = () => {
+  const loadItems = () => {
     getData().then((data) => {
       setCards(data);
     });

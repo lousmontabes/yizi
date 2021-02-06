@@ -12,12 +12,12 @@ const Main = (props) => {
   const [createViewVisible, setCreateViewVisible] = useState(false);
   const { cards, refresh } = props;
 
-  showCreateView = () => {
+  const showCreateView = () => {
     Haptics.impactAsync();
     setCreateViewVisible(true);
   };
 
-  hideCreateView = (createdNew) => {
+  const hideCreateView = (createdNew) => {
     createdNew && refresh();
     setCreateViewVisible(false);
   };
@@ -25,7 +25,7 @@ const Main = (props) => {
   return (
     <SafeAreaProvider>
       <Header
-        barStyle="light-content" // or directly
+        barStyle="light-content"
         placement="center"
         centerComponent={{ text: "yizi", style: styles.logo }}
         containerStyle={{
@@ -98,8 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "500",
   },
-
-  icons: { position: "absolute", right: 10, bottom: 50 },
+  icons: { position: "absolute", right: 10, bottom: 50, zIndex: 10 },
 });
 
 export default Main;
