@@ -135,17 +135,19 @@ const Pile = (props) => {
           ></Card>
         </Animated.View>
       </View>
-      <Animated.View
-        style={{
-          flex: 3,
-          alignContent: "center",
-          alignItems: "center",
-          zIndex: 0,
-          opacity: emptyMessageOpacity,
-        }}
-      >
-        <EmptyMessage></EmptyMessage>
-      </Animated.View>
+      {cards.length === 0 && (
+        <Animated.View
+          style={{
+            flex: 3,
+            alignContent: "center",
+            alignItems: "center",
+            zIndex: 0,
+            opacity: emptyMessageOpacity,
+          }}
+        >
+          <EmptyMessage></EmptyMessage>
+        </Animated.View>
+      )}
     </>
   );
 };
