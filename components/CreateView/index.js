@@ -117,7 +117,6 @@ const CreateView = (props) => {
       Haptics.impactAsync();
 
       getData().then((currentItems) => {
-        console.log(currentItems);
         currentItems.push({ title, subtitle });
         storeData(currentItems);
       });

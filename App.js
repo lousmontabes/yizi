@@ -7,7 +7,6 @@ const App = () => {
 
   loadItems = () => {
     getData().then((data) => {
-      console.log(cards);
       setCards(data);
     });
   };
