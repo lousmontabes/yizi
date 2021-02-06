@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Animated,
   PanResponder,
+  View,
 } from "react-native";
 import { Icon } from "react-native-elements";
 import * as Haptics from "expo-haptics";
@@ -18,6 +19,33 @@ const CreateView = (props) => {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pan = useRef(new Animated.ValueXY()).current;
+  const titleShake = useRef(new Animated.Value(0)).current;
+  const subtitleShake = useRef(new Animated.Value(0)).current;
+
+  const startShake = (shakeAnimation) => {
+    Animated.sequence([
+      Animated.timing(shakeAnimation, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimation, {
+        toValue: -10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimation, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shakeAnimation, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
 
   const titleInputRef = useRef();
   const subtitleInputRef = useRef();
@@ -37,7 +65,7 @@ const CreateView = (props) => {
           { toValue: { x: 0, y: 0 }, useNativeDriver: true }
         ).start();
       } else {
-        hide();
+        hideView();
       }
     },
   });
@@ -55,7 +83,7 @@ const CreateView = (props) => {
     titleInputRef.current.focus();
   }, []);
 
-  const hide = () => {
+  const hideView = () => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -75,13 +103,30 @@ const CreateView = (props) => {
     });
   };
 
+  const sanitizeInput = () => {};
+
+  const isInputValid = (input) => {
+    return input.trim() !== "";
+  };
+
   const submitItem = () => {
-    getData().then((currentItems) => {
-      console.log(currentItems);
-      currentItems.push({ title, subtitle });
-      storeData(currentItems);
-    });
-    hide();
+    const isTitleValid = isInputValid(title);
+    const isSubtitleValid = isInputValid(subtitle);
+
+    if (isTitleValid && isSubtitleValid) {
+      Haptics.impactAsync();
+
+      getData().then((currentItems) => {
+        console.log(currentItems);
+        currentItems.push({ title, subtitle });
+        storeData(currentItems);
+      });
+      hideView();
+    } else {
+      !isTitleValid && startShake(titleShake);
+      !isSubtitleValid && startShake(subtitleShake);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
   };
 
   const onSubmitTitle = () => {
@@ -104,36 +149,65 @@ const CreateView = (props) => {
           }}
           {...panResponder.panHandlers}
         >
-          <TextInput
-            ref={titleInputRef}
-            onChangeText={(text) => setTitle(text)}
-            onSubmitEditing={onSubmitTitle}
-            placeholder="Cool new word"
-            placeholderTextColor="#999"
-            selectionColor={"#000"}
-            style={styles.titleInput}
-          />
-          <TextInput
-            ref={subtitleInputRef}
-            onChangeText={(text) => setSubtitle(text)}
-            onSubmitEditing={submitItem}
-            placeholder="Its deep meaning"
-            placeholderTextColor="#999"
-            selectionColor={"#000"}
-            style={styles.subtitleInput}
-          />
-          <Icon
-            containerStyle={styles.newButton}
-            reverse
-            raised
-            size={28}
-            type="feather"
-            name="check"
-            onPress={() => {
-              Haptics.impactAsync();
-              submitItem();
+          <Animated.View
+            style={{
+              transform: [{ translateX: titleShake }],
             }}
-          />
+          >
+            <TextInput
+              ref={titleInputRef}
+              maxLength={25}
+              onChangeText={(text) => setTitle(text)}
+              onSubmitEditing={onSubmitTitle}
+              placeholder="Cool new word"
+              placeholderTextColor="#999"
+              selectionColor={"#000"}
+              style={styles.titleInput}
+            />
+          </Animated.View>
+          <Animated.View
+            style={{
+              transform: [{ translateX: subtitleShake }],
+            }}
+          >
+            <TextInput
+              ref={subtitleInputRef}
+              maxLength={50}
+              multiline={true}
+              onChangeText={(text) => setSubtitle(text)}
+              onSubmitEditing={submitItem}
+              placeholder="Its deep meaning"
+              placeholderTextColor="#999"
+              selectionColor={"#000"}
+              style={styles.subtitleInput}
+            />
+          </Animated.View>
+          <View style={styles.icons}>
+            <Icon
+              containerStyle={styles.newButton}
+              size={28}
+              reverse
+              color="white"
+              reverseColor="black"
+              type="feather"
+              name="x"
+              onPress={() => {
+                Haptics.impactAsync();
+                hideView();
+              }}
+            />
+            <Icon
+              containerStyle={styles.newButton}
+              reverse
+              raised
+              size={28}
+              type="feather"
+              name="check"
+              onPress={() => {
+                submitItem();
+              }}
+            />
+          </View>
         </Animated.View>
       </KeyboardAvoidingView>
     </Animated.View>
@@ -161,17 +235,16 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontFamily: "Avenir",
     fontWeight: "500",
+    marginHorizontal: 15,
   },
   subtitleInput: {
     textAlign: "center",
     fontSize: 28,
     fontFamily: "Avenir",
+    marginHorizontal: 15,
   },
-  newButton: {
-    position: "absolute",
-    right: 10,
-    bottom: 10,
-  },
+  newButton: {},
+  icons: { position: "absolute", right: 10, bottom: 10 },
 });
 
 export default CreateView;
