@@ -5,11 +5,15 @@ import { getData, clear } from "./utils/storage";
 const App = () => {
   const [cards, setCards] = useState([]);
 
-  useEffect(() => {
+  loadItems = () => {
     getData().then((data) => {
       console.log(cards);
       setCards(data);
     });
+  };
+
+  useEffect(() => {
+    loadItems();
   }, []);
 
   return <Main cards={cards}></Main>;

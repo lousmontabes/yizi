@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
   StyleSheet,
   TextInput,
   KeyboardAvoidingView,
@@ -10,8 +9,8 @@ import {
 import { Icon } from "react-native-elements";
 import * as Haptics from "expo-haptics";
 
-import { confirmDistance } from "constants";
-import { storeData, getData } from "utils/storage";
+import { confirmDistance } from "../../constants";
+import { storeData, getData } from "../../utils/storage";
 
 const CreateView = (props) => {
   const [title, setTitle] = useState("");
