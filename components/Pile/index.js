@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Animated,
   StyleSheet,
@@ -27,7 +27,7 @@ const EmptyMessage = () => {
 const Pile = (props) => {
   const { cards } = props;
 
-  const initialState = { title: "椅子 Yǐzi", subtitle: "Chair" };
+  const initialState = { title: "", subtitle: "" };
   const [card, setCard] = useState(initialState);
 
   const pan = useRef(new Animated.ValueXY()).current;
@@ -97,7 +97,8 @@ const Pile = (props) => {
     cardColor.setValue(0);
 
     if (cards.length > 0) {
-      setCard(cards.pop());
+      const n = cards.pop();
+      setCard(n);
 
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -112,6 +113,10 @@ const Pile = (props) => {
       }).start();
     }
   };
+
+  useEffect(() => {
+    showNextCard();
+  }, [cards]);
 
   return (
     <>

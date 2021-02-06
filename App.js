@@ -16,7 +16,7 @@ const App = () => {
     loadItems();
   }, []);
 
-  return <Main cards={cards}></Main>;
+  return <Main cards={cards} refresh={loadItems}></Main>;
 };
 
 export default App;

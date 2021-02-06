@@ -65,7 +65,7 @@ const CreateView = (props) => {
           { toValue: { x: 0, y: 0 }, useNativeDriver: true }
         ).start();
       } else {
-        hideView();
+        hideView(false);
       }
     },
   });
@@ -83,7 +83,7 @@ const CreateView = (props) => {
     titleInputRef.current.focus();
   }, []);
 
-  const hideView = () => {
+  const hideView = (confirm) => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -99,7 +99,7 @@ const CreateView = (props) => {
         }
       ),
     ]).start(() => {
-      props.onBlackoutPress();
+      props.hide(confirm);
     });
   };
 
@@ -121,7 +121,7 @@ const CreateView = (props) => {
         currentItems.push({ title, subtitle });
         storeData(currentItems);
       });
-      hideView();
+      hideView(true);
     } else {
       !isTitleValid && startShake(titleShake);
       !isSubtitleValid && startShake(subtitleShake);
@@ -131,6 +131,11 @@ const CreateView = (props) => {
 
   const onSubmitTitle = () => {
     subtitleInputRef.current.focus();
+  };
+
+  onInputSubtitle = (text) => {
+    // Remove user-input line breaks
+    setSubtitle(text.replace("\n", " "));
   };
 
   return (
@@ -144,9 +149,6 @@ const CreateView = (props) => {
             ...styles.inner,
             transform: [{ translateY: Animated.divide(pan.y, 3) }],
           }}
-          onPress={() => {
-            console.log("hi");
-          }}
           {...panResponder.panHandlers}
         >
           <Animated.View
@@ -159,7 +161,7 @@ const CreateView = (props) => {
               maxLength={25}
               onChangeText={(text) => setTitle(text)}
               onSubmitEditing={onSubmitTitle}
-              placeholder="Cool new word"
+              placeholder="New yizi"
               placeholderTextColor="#999"
               selectionColor={"#000"}
               style={styles.titleInput}
@@ -174,12 +176,13 @@ const CreateView = (props) => {
               ref={subtitleInputRef}
               maxLength={50}
               multiline={true}
-              onChangeText={(text) => setSubtitle(text)}
+              onChangeText={onInputSubtitle}
               onSubmitEditing={submitItem}
               placeholder="Its deep meaning"
               placeholderTextColor="#999"
               selectionColor={"#000"}
               style={styles.subtitleInput}
+              value={subtitle}
             />
           </Animated.View>
           <View style={styles.icons}>
@@ -193,7 +196,7 @@ const CreateView = (props) => {
               name="x"
               onPress={() => {
                 Haptics.impactAsync();
-                hideView();
+                hideView(false);
               }}
             />
             <Icon
@@ -225,6 +228,7 @@ const styles = StyleSheet.create({
   },
   inner: {
     height: 500,
+    backgroundColor: "#FFF",
     shadowColor: "#000",
     flex: 1,
     justifyContent: "center",

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Header, Icon } from "react-native-elements";
 import * as Haptics from "expo-haptics";
@@ -9,8 +9,18 @@ import Pile from "../../components/Pile";
 import CreateView from "../../components/CreateView";
 
 const Main = (props) => {
-  const [showCreateView, setShowCreateView] = useState(false);
-  const { cards } = props;
+  const [createViewVisible, setCreateViewVisible] = useState(false);
+  const { cards, refresh } = props;
+
+  showCreateView = () => {
+    Haptics.impactAsync();
+    setCreateViewVisible(true);
+  };
+
+  hideCreateView = (createdNew) => {
+    createdNew && refresh();
+    setCreateViewVisible(false);
+  };
 
   return (
     <SafeAreaProvider>
@@ -26,23 +36,26 @@ const Main = (props) => {
         }}
       />
       <Pile cards={cards}></Pile>
-      <Icon
-        containerStyle={styles.newButton}
-        reverse
-        raised
-        size={28}
-        type="feather"
-        name="edit-2"
-        onPress={() => {
-          Haptics.impactAsync();
-          setShowCreateView(true);
-        }}
-      />
-      {showCreateView && (
-        <CreateView
-          onBlackoutPress={() => setShowCreateView(false)}
-        ></CreateView>
-      )}
+      <View style={styles.icons}>
+        <Icon
+          size={28}
+          reverse
+          color="white"
+          reverseColor="black"
+          type="feather"
+          name="refresh-ccw"
+          onPress={props.refresh}
+        />
+        <Icon
+          reverse
+          raised
+          size={28}
+          type="feather"
+          name="edit-2"
+          onPress={showCreateView}
+        />
+      </View>
+      {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
       <StatusBar barStyle="default" />
     </SafeAreaProvider>
   );
@@ -85,11 +98,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "500",
   },
-  newButton: {
-    position: "absolute",
-    right: 10,
-    bottom: 50,
-  },
+
+  icons: { position: "absolute", right: 10, bottom: 50 },
 });
 
 export default Main;
