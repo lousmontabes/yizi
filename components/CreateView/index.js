@@ -78,11 +78,6 @@ const CreateView = (props) => {
     }).start();
   }, [fadeAnim]);
 
-  useEffect(() => {
-    // Update the document title using the browser API
-    titleInputRef.current.focus();
-  }, []);
-
   const hideView = (confirm) => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -134,7 +129,7 @@ const CreateView = (props) => {
 
   const onInputSubtitle = (text) => {
     // Remove user-input line breaks
-    setSubtitle(text.replace("\n", " "));
+    setSubtitle(text.replace("\n", ""));
   };
 
   return (
@@ -156,6 +151,7 @@ const CreateView = (props) => {
             }}
           >
             <TextInput
+              autoFocus
               ref={titleInputRef}
               maxLength={25}
               onChangeText={(text) => setTitle(text)}
@@ -164,6 +160,9 @@ const CreateView = (props) => {
               placeholderTextColor="#999"
               selectionColor={"#000"}
               style={styles.titleInput}
+              returnKeyType="next"
+              selectTextOnFocus
+              spellCheck={false}
             />
           </Animated.View>
           <Animated.View
@@ -182,6 +181,10 @@ const CreateView = (props) => {
               selectionColor={"#000"}
               style={styles.subtitleInput}
               value={subtitle}
+              enablesReturnKeyAutomatically
+              returnKeyType="done"
+              scrollEnabled={false}
+              selectTextOnFocus
             />
           </Animated.View>
           <View style={styles.icons}>
