@@ -90,9 +90,50 @@ const Pile = (props) => {
     },
   });
 
+  const nextCardTranslateY = pan.y.interpolate({
+    inputRange: [
+      -confirmDistance - 1,
+      -confirmDistance,
+      0,
+      confirmDistance,
+      confirmDistance + 1,
+    ],
+    outputRange: [0, 0, 10, 0, 0],
+  });
+  const nextCardTranslateX = pan.y.interpolate({
+    inputRange: [
+      -confirmDistance - 1,
+      -confirmDistance,
+      0,
+      confirmDistance,
+      confirmDistance + 1,
+    ],
+    outputRange: [0, 0, 0, 0, 0],
+  });
+  const nextCardRotation = pan.y.interpolate({
+    inputRange: [
+      -confirmDistance - 1,
+      -confirmDistance,
+      0,
+      confirmDistance,
+      confirmDistance + 1,
+    ],
+    outputRange: [0, 0, 0.03, 0, 0],
+  });
+  const thirdCardOpacity = pan.y.interpolate({
+    inputRange: [
+      -confirmDistance - 1,
+      -confirmDistance,
+      0,
+      confirmDistance,
+      confirmDistance + 1,
+    ],
+    outputRange: [1, 1, 0, 1, 1],
+  });
+
   const showNextCard = () => {
     pan.setValue({ x: 0, y: 0 });
-    fadeAnim.setValue(0);
+    //fadeAnim.setValue(0);
     cardColor.setValue(0);
 
     if (cards.length > 0) {
@@ -136,11 +177,39 @@ const Pile = (props) => {
           ></Card>
         </Animated.View>
         <View style={styles.nextCard}>
-          <Card
-            title={nextCard.title}
-            subtitle={nextCard.subtitle}
-            color={cardColor}
-          ></Card>
+          <Animated.View
+            style={{
+              transform: [
+                { translateX: nextCardTranslateX },
+                { translateY: nextCardTranslateY },
+                { rotate: nextCardRotation },
+              ],
+            }}
+          >
+            <Card
+              title={nextCard.title}
+              subtitle={nextCard.subtitle}
+              color={new Animated.Value(0)} // Always black
+            ></Card>
+          </Animated.View>
+        </View>
+        <View style={styles.thirdCard}>
+          <Animated.View
+            style={{
+              transform: [
+                { translateX: 0 },
+                { translateY: 10 },
+                { rotate: 0.03 },
+              ],
+              opacity: thirdCardOpacity,
+            }}
+          >
+            <Card
+              title={""}
+              subtitle={""}
+              color={new Animated.Value(0)} // Always black
+            ></Card>
+          </Animated.View>
         </View>
       </View>
       {cards.length === 0 && (
@@ -164,6 +233,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     zIndex: 1,
+    marginVertical: 8,
+    marginHorizontal: 16,
   },
   header: {
     position: "absolute",
@@ -206,11 +277,13 @@ const styles = StyleSheet.create({
     width: "100%",
     position: "absolute",
     zIndex: -10,
-    transform: [
-      { rotate: (Math.random() * 2 - 1) * 0.05 },
-      { translateX: Math.random() * 5 },
-      { translateY: Math.random() * 10 },
-    ],
+    padding: 0,
+  },
+  thirdCard: {
+    flex: 1,
+    width: "100%",
+    position: "absolute",
+    zIndex: -11,
   },
 });
 

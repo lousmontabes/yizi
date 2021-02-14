@@ -39,7 +39,7 @@ const Main = (props) => {
         <Icon
           size={28}
           reverse
-          color="white"
+          color="transparent"
           reverseColor="black"
           type="feather"
           name="refresh-ccw"
