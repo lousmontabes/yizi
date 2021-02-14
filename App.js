@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { StyleSheet, SafeAreaView } from "react-native";
 import Main from "./components/Main";
 import { getData, clear } from "./utils/storage";
 
@@ -15,7 +16,17 @@ const App = () => {
     loadItems();
   }, []);
 
-  return <Main cards={cards} refresh={loadItems}></Main>;
+  return (
+    <SafeAreaView style={styles.container}>
+      <Main cards={cards} refresh={loadItems}></Main>
+    </SafeAreaView>
+  );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});
 
 export default App;

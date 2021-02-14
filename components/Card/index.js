@@ -27,12 +27,12 @@ const Card = (props) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.card}>
         <Animated.Text style={titleStyle}>{title}</Animated.Text>
         <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     borderColor: "#DDD",
     borderWidth: 1,
     justifyContent: "center",
+    zIndex: 1,
   },
   title: {
     textAlign: "center",

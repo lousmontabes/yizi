@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, View } from "react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Header, Icon } from "react-native-elements";
 import * as Haptics from "expo-haptics";
 
@@ -23,7 +22,7 @@ const Main = (props) => {
   };
 
   return (
-    <SafeAreaProvider>
+    <>
       <Header
         barStyle="light-content"
         placement="center"
@@ -57,7 +56,7 @@ const Main = (props) => {
       </View>
       {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
       <StatusBar barStyle="default" />
-    </SafeAreaProvider>
+    </>
   );
 };
 
