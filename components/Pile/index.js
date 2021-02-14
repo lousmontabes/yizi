@@ -40,8 +40,7 @@ const Pile = (props) => {
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
-      const { dx, dy } = gestureState;
-      //const d = Math.sqrt(dx * dx + dy * dy);
+      const { dy } = gestureState;
       const d = Math.abs(dy);
 
       if (d > confirmDistance && prevD < confirmDistance) {

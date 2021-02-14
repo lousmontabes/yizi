@@ -18,7 +18,9 @@ const CreateView = (props) => {
   const [subtitle, setSubtitle] = useState("");
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const pan = useRef(new Animated.ValueXY()).current;
+  const pan = useRef(new Animated.Value(0)).current;
+  const nextAnim = useRef(new Animated.Value(0)).current;
+  const nextOpacity = useRef(new Animated.Value(1)).current;
   const titleShake = useRef(new Animated.Value(0)).current;
   const subtitleShake = useRef(new Animated.Value(0)).current;
 
@@ -53,16 +55,16 @@ const CreateView = (props) => {
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
-      Animated.event([null, { dy: pan.y }], {
+      Animated.event([null, { dy: pan }], {
         useNativeDriver: false,
       })(e, gestureState);
     },
     onPanResponderRelease: () => {
-      const d = pan.y._value;
+      const d = pan._value;
       if (d < confirmDistance) {
         Animated.spring(
           pan, // Auto-multiplexed
-          { toValue: { x: 0, y: 0 }, useNativeDriver: true }
+          { toValue: 0, useNativeDriver: true }
         ).start();
       } else {
         hideView(false);
@@ -78,23 +80,23 @@ const CreateView = (props) => {
     }).start();
   }, [fadeAnim]);
 
-  const hideView = (confirm) => {
+  const hideView = (itemAdded) => {
+    titleInputRef.current.isFocused() && titleInputRef.current.blur();
+    subtitleInputRef.current.isFocused() && subtitleInputRef.current.blur();
+
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 150,
         useNativeDriver: false,
       }),
-      Animated.timing(
-        pan, // Auto-multiplexed
-        {
-          toValue: { x: 0, y: 1000 },
-          duration: 150,
-          useNativeDriver: true,
-        }
-      ),
+      Animated.timing(pan, {
+        toValue: 1000,
+        duration: 150,
+        useNativeDriver: true,
+      }),
     ]).start(() => {
-      props.hide(confirm);
+      props.hide(itemAdded);
     });
   };
 
@@ -115,12 +117,35 @@ const CreateView = (props) => {
         currentItems.push({ title, subtitle });
         storeData(currentItems);
       });
-      hideView(true);
+      showNextInput();
     } else {
       !isTitleValid && startShake(titleShake);
       !isSubtitleValid && startShake(subtitleShake);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
+  };
+
+  const showNextInput = () => {
+    Animated.timing(nextAnim, {
+      toValue: -1000,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => {
+      resetInputs();
+      titleInputRef.current.focus();
+      nextAnim.setValue(0);
+      nextOpacity.setValue(0);
+      Animated.timing(nextOpacity, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
+  const resetInputs = () => {
+    setTitle("");
+    setSubtitle("");
   };
 
   const onSubmitTitle = () => {
@@ -141,51 +166,57 @@ const CreateView = (props) => {
         <Animated.View
           style={{
             ...styles.inner,
-            transform: [{ translateY: Animated.divide(pan.y, 3) }],
+            transform: [{ translateY: Animated.divide(pan, 3) }],
           }}
           {...panResponder.panHandlers}
         >
           <Animated.View
             style={{
-              transform: [{ translateX: titleShake }],
+              transform: [{ translateY: nextAnim }],
+              opacity: nextOpacity,
             }}
           >
-            <TextInput
-              autoFocus
-              ref={titleInputRef}
-              maxLength={25}
-              onChangeText={(text) => setTitle(text)}
-              onSubmitEditing={onSubmitTitle}
-              placeholder="New yizi"
-              placeholderTextColor="#999"
-              selectionColor={"#000"}
-              style={styles.titleInput}
-              returnKeyType="next"
-              selectTextOnFocus
-              spellCheck={false}
-            />
-          </Animated.View>
-          <Animated.View
-            style={{
-              transform: [{ translateX: subtitleShake }],
-            }}
-          >
-            <TextInput
-              ref={subtitleInputRef}
-              maxLength={50}
-              multiline={true}
-              onChangeText={onInputSubtitle}
-              onSubmitEditing={submitItem}
-              placeholder="Its deep meaning"
-              placeholderTextColor="#999"
-              selectionColor={"#000"}
-              style={styles.subtitleInput}
-              value={subtitle}
-              enablesReturnKeyAutomatically
-              returnKeyType="done"
-              scrollEnabled={false}
-              selectTextOnFocus
-            />
+            <Animated.View
+              style={{
+                transform: [{ translateX: titleShake }],
+              }}
+            >
+              <TextInput
+                autoFocus
+                ref={titleInputRef}
+                value={title}
+                maxLength={25}
+                onChangeText={(text) => setTitle(text)}
+                onSubmitEditing={onSubmitTitle}
+                placeholder="New yizi"
+                placeholderTextColor="#999"
+                selectionColor={"#000"}
+                style={styles.titleInput}
+                returnKeyType="next"
+                spellCheck={false}
+              />
+            </Animated.View>
+            <Animated.View
+              style={{
+                transform: [{ translateX: subtitleShake }],
+              }}
+            >
+              <TextInput
+                ref={subtitleInputRef}
+                value={subtitle}
+                maxLength={50}
+                multiline={true}
+                onChangeText={onInputSubtitle}
+                onSubmitEditing={submitItem}
+                placeholder="Its deep meaning"
+                placeholderTextColor="#999"
+                selectionColor={"#000"}
+                style={styles.subtitleInput}
+                enablesReturnKeyAutomatically
+                returnKeyType="done"
+                scrollEnabled={false}
+              />
+            </Animated.View>
           </Animated.View>
           <View style={styles.icons}>
             <Icon
