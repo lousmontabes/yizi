@@ -117,6 +117,8 @@ const Pile = (props) => {
     showNextCard();
   }, [cards]);
 
+  const nextCard = cards[cards.length - 1] || { title: "", subtitle: "" };
+
   return (
     <>
       <View style={styles.container}>
@@ -133,6 +135,13 @@ const Pile = (props) => {
             color={cardColor}
           ></Card>
         </Animated.View>
+        <View style={styles.nextCard}>
+          <Card
+            title={nextCard.title}
+            subtitle={nextCard.subtitle}
+            color={cardColor}
+          ></Card>
+        </View>
       </View>
       {cards.length === 0 && (
         <Animated.View
@@ -191,6 +200,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 10,
     bottom: 50,
+  },
+  nextCard: {
+    flex: 1,
+    width: "100%",
+    position: "absolute",
+    zIndex: -10,
+    transform: [
+      { rotate: (Math.random() * 2 - 1) * 0.05 },
+      { translateX: Math.random() * 5 },
+      { translateY: Math.random() * 10 },
+    ],
   },
 });
 
