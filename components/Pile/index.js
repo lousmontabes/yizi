@@ -6,6 +6,7 @@ import {
   PanResponder,
   Text,
   Image,
+  Easing,
 } from "react-native";
 import * as Haptics from "expo-haptics";
 
@@ -36,6 +37,7 @@ const Pile = (props) => {
   const cardColor = useRef(new Animated.Value(0)).current;
 
   let prevD = 0;
+  const dismissTarget = 1000;
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -65,69 +67,41 @@ const Pile = (props) => {
       })(e, gestureState);
     },
     onPanResponderRelease: () => {
-      const x = pan.x._value;
       const y = pan.y._value;
-      //const d = Math.sqrt(x * x + y * y);
       const d = Math.abs(y);
 
       if (d < confirmDistance) {
         Animated.spring(
-          pan, // Auto-multiplexed
+          pan,
           { toValue: { x: 0, y: 0 }, useNativeDriver: true } // Back to zero
         ).start();
       } else {
-        Animated.timing(
-          pan, // Auto-multiplexed
-          {
-            toValue: { x: 0, y: y > 0 ? 1000 : -1000 },
-            duration: 150,
-            useNativeDriver: true,
-          }
-        ).start(() => {
+        Animated.timing(pan, {
+          toValue: { x: 0, y: y > 0 ? dismissTarget : -dismissTarget },
+          duration: 150,
+          useNativeDriver: true,
+        }).start(() => {
           showNextCard();
         });
       }
     },
   });
 
+  const target = confirmDistance * 2;
   const nextCardTranslateY = pan.y.interpolate({
-    inputRange: [
-      -confirmDistance - 1,
-      -confirmDistance,
-      0,
-      confirmDistance,
-      confirmDistance + 1,
-    ],
+    inputRange: [-target - 1, -target, 0, target, target + 1],
     outputRange: [0, 0, 10, 0, 0],
   });
   const nextCardTranslateX = pan.y.interpolate({
-    inputRange: [
-      -confirmDistance - 1,
-      -confirmDistance,
-      0,
-      confirmDistance,
-      confirmDistance + 1,
-    ],
+    inputRange: [-target - 1, -target, 0, target, target + 1],
     outputRange: [0, 0, 0, 0, 0],
   });
   const nextCardRotation = pan.y.interpolate({
-    inputRange: [
-      -confirmDistance - 1,
-      -confirmDistance,
-      0,
-      confirmDistance,
-      confirmDistance + 1,
-    ],
+    inputRange: [-target - 1, -target, 0, target, target + 1],
     outputRange: [0, 0, 0.03, 0, 0],
   });
   const thirdCardOpacity = pan.y.interpolate({
-    inputRange: [
-      -confirmDistance - 1,
-      -confirmDistance,
-      0,
-      confirmDistance,
-      confirmDistance + 1,
-    ],
+    inputRange: [-target - 1, -target, 0, target, target + 1],
     outputRange: [1, 1, 0, 1, 1],
   });
 

@@ -19,7 +19,7 @@ const CreateView = (props) => {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pan = useRef(new Animated.Value(0)).current;
-  const nextAnim = useRef(new Animated.Value(0)).current;
+  const nextAnim = useRef(new Animated.Value(1)).current;
   const nextOpacity = useRef(new Animated.Value(1)).current;
   const titleShake = useRef(new Animated.Value(0)).current;
   const subtitleShake = useRef(new Animated.Value(0)).current;
@@ -75,7 +75,7 @@ const CreateView = (props) => {
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 100,
+      duration: 200,
       useNativeDriver: false,
     }).start();
   }, [fadeAnim]);
@@ -127,13 +127,13 @@ const CreateView = (props) => {
 
   const showNextInput = () => {
     Animated.timing(nextAnim, {
-      toValue: -1000,
-      duration: 200,
+      toValue: 0,
+      duration: 100,
       useNativeDriver: true,
     }).start(() => {
       resetInputs();
       titleInputRef.current.focus();
-      nextAnim.setValue(0);
+      nextAnim.setValue(1);
       nextOpacity.setValue(0);
       Animated.timing(nextOpacity, {
         toValue: 1,
@@ -172,7 +172,7 @@ const CreateView = (props) => {
         >
           <Animated.View
             style={{
-              transform: [{ translateY: nextAnim }],
+              transform: [{ scale: nextAnim }],
               opacity: nextOpacity,
             }}
           >
