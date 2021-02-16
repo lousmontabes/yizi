@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -6,16 +6,16 @@ import {
   Animated,
   PanResponder,
   View,
-} from "react-native";
-import { Icon } from "react-native-elements";
-import * as Haptics from "expo-haptics";
+} from 'react-native';
+import { Icon } from 'react-native-elements';
+import * as Haptics from 'expo-haptics';
 
-import { confirmDistance } from "../../constants";
-import { storeData, getData } from "../../utils/storage";
+import { confirmDistance } from '../../constants';
+import { storeData, getData } from '../../utils/storage';
 
 const CreateView = (props) => {
-  const [title, setTitle] = useState("");
-  const [subtitle, setSubtitle] = useState("");
+  const [title, setTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pan = useRef(new Animated.Value(0)).current;
@@ -100,10 +100,12 @@ const CreateView = (props) => {
     });
   };
 
-  const sanitizeInput = () => {};
+  const sanitizeInput = (input) => {
+    return input.trim();
+  };
 
   const isInputValid = (input) => {
-    return input.trim() !== "";
+    return input.trim() !== '';
   };
 
   const submitItem = () => {
@@ -114,7 +116,10 @@ const CreateView = (props) => {
       Haptics.impactAsync();
 
       getData().then((currentItems) => {
-        currentItems.push({ title, subtitle });
+        currentItems.push({
+          title: sanitizeInput(title),
+          subtitle: sanitizeInput(subtitle),
+        });
         storeData(currentItems);
       });
       showNextInput();
@@ -144,8 +149,8 @@ const CreateView = (props) => {
   };
 
   const resetInputs = () => {
-    setTitle("");
-    setSubtitle("");
+    setTitle('');
+    setSubtitle('');
   };
 
   const onSubmitTitle = () => {
@@ -154,13 +159,13 @@ const CreateView = (props) => {
 
   const onInputSubtitle = (text) => {
     // Remove user-input line breaks
-    setSubtitle(text.replace("\n", ""));
+    setSubtitle(text.replace('\n', ''));
   };
 
   return (
     <Animated.View style={{ ...styles.container, opacity: fadeAnim }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
       >
         <Animated.View
@@ -190,7 +195,7 @@ const CreateView = (props) => {
                 onSubmitEditing={onSubmitTitle}
                 placeholder="New yizi"
                 placeholderTextColor="#999"
-                selectionColor={"#000"}
+                selectionColor={'#000'}
                 style={styles.titleInput}
                 returnKeyType="next"
                 spellCheck={false}
@@ -210,7 +215,7 @@ const CreateView = (props) => {
                 onSubmitEditing={submitItem}
                 placeholder="Its deep meaning"
                 placeholderTextColor="#999"
-                selectionColor={"#000"}
+                selectionColor={'#000'}
                 style={styles.subtitleInput}
                 enablesReturnKeyAutomatically
                 returnKeyType="done"
@@ -254,34 +259,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     zIndex: 34,
-    backgroundColor: "#FFF",
-    height: "100%",
-    width: "100%",
-    position: "absolute",
+    backgroundColor: '#FFF',
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
   },
   inner: {
     height: 500,
-    backgroundColor: "#FFF",
-    shadowColor: "#000",
+    backgroundColor: '#FFF',
+    shadowColor: '#000',
     flex: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     zIndex: 34,
   },
   titleInput: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 42,
-    fontFamily: "Avenir",
-    fontWeight: "500",
+    fontFamily: 'Avenir',
+    fontWeight: '500',
     marginHorizontal: 15,
   },
   subtitleInput: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 28,
-    fontFamily: "Avenir",
+    fontFamily: 'Avenir',
     marginHorizontal: 15,
   },
   newButton: {},
-  icons: { position: "absolute", right: 10, bottom: 10 },
+  icons: { position: 'absolute', right: 10, bottom: 10 },
 });
 
 export default CreateView;
