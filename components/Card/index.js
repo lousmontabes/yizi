@@ -1,14 +1,14 @@
-import React from "react";
-import { Animated, SafeAreaView, View, StyleSheet, Text } from "react-native";
+import React from 'react';
+import { Animated, SafeAreaView, View, StyleSheet, Text } from 'react-native';
 
 const Card = (props) => {
   const { title, subtitle, color } = props;
 
   // TODO: Move this to constants
   const colors = {
-    green: "rgba(116, 198, 157, 1)",
-    black: "rgba(0, 0, 0, 1)",
-    red: "rgba(217, 119, 119, 1)",
+    green: 'rgba(116, 198, 157, 1)',
+    black: 'rgba(0, 0, 0, 1)',
+    red: 'rgba(217, 119, 119, 1)',
   };
 
   const textColor = color.interpolate({
@@ -39,36 +39,36 @@ const Card = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
-    fontFamily: "Menlo",
+    backgroundColor: '#FFF',
+    fontFamily: 'Menlo',
   },
   card: {
-    backgroundColor: "#FFF",
+    backgroundColor: '#FFF',
     height: 500,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 5,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
     elevation: 24,
     borderRadius: 5,
-    borderColor: "#DDD",
+    borderColor: '#EEE',
     borderWidth: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     zIndex: 1,
   },
   title: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 42,
-    fontFamily: "Avenir",
-    fontWeight: "500",
+    fontFamily: 'Avenir',
+    fontWeight: '500',
   },
   description: {
-    textAlign: "center",
+    textAlign: 'center',
     fontSize: 28,
-    fontFamily: "Avenir",
+    fontFamily: 'Avenir',
   },
 });
 
