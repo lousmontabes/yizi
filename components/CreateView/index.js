@@ -67,7 +67,7 @@ const CreateView = (props) => {
           { toValue: 0, useNativeDriver: true }
         ).start();
       } else {
-        hideView(false);
+        hideView(true);
       }
     },
   });
@@ -100,8 +100,12 @@ const CreateView = (props) => {
     });
   };
 
+  const presentInput = (input) => {
+    return input.trimLeft().replace('\n', '');
+  };
+
   const sanitizeInput = (input) => {
-    return input.trim();
+    return input.trim().replace('\n', '');
   };
 
   const isInputValid = (input) => {
@@ -157,11 +161,6 @@ const CreateView = (props) => {
     subtitleInputRef.current.focus();
   };
 
-  const onInputSubtitle = (text) => {
-    // Remove user-input line breaks
-    setSubtitle(text.replace('\n', ''));
-  };
-
   return (
     <Animated.View style={{ ...styles.container, opacity: fadeAnim }}>
       <KeyboardAvoidingView
@@ -191,7 +190,7 @@ const CreateView = (props) => {
                 ref={titleInputRef}
                 value={title}
                 maxLength={25}
-                onChangeText={(text) => setTitle(text)}
+                onChangeText={(text) => setTitle(presentInput(text))}
                 onSubmitEditing={onSubmitTitle}
                 placeholder="New yizi"
                 placeholderTextColor="#999"
@@ -211,7 +210,7 @@ const CreateView = (props) => {
                 value={subtitle}
                 maxLength={50}
                 multiline={true}
-                onChangeText={onInputSubtitle}
+                onChangeText={(text) => setSubtitle(presentInput(text))}
                 onSubmitEditing={submitItem}
                 placeholder="Its deep meaning"
                 placeholderTextColor="#999"
@@ -234,7 +233,7 @@ const CreateView = (props) => {
               name="x"
               onPress={() => {
                 Haptics.impactAsync();
-                hideView(false);
+                hideView(true);
               }}
             />
             <Icon
