@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from 'react';
 import {
   Animated,
   StyleSheet,
@@ -7,16 +7,16 @@ import {
   Text,
   Image,
   Easing,
-} from "react-native";
-import * as Haptics from "expo-haptics";
+} from 'react-native';
+import * as Haptics from 'expo-haptics';
 
-import Card from "../Card";
-import { confirmDistance } from "../../constants";
+import Card from '../Card';
+import { confirmDistance } from '../../constants';
 
 const EmptyMessage = () => {
   return (
     <View>
-      <Image style={styles.komo} source={require("../../assets/komo.webp")} />
+      <Image style={styles.komo} source={require('../../assets/komo.webp')} />
       <Text style={styles.emptyMessageText}>You've learnt a lot!</Text>
       <Text style={styles.emptyMessageSubtitle}>
         You've gone through all your Yizis.
@@ -28,7 +28,7 @@ const EmptyMessage = () => {
 const Pile = (props) => {
   const { cards } = props;
 
-  const initialState = { title: "", subtitle: "" };
+  const initialState = { title: '', subtitle: '' };
   const [card, setCard] = useState(initialState);
 
   const pan = useRef(new Animated.ValueXY()).current;
@@ -87,7 +87,7 @@ const Pile = (props) => {
     },
   });
 
-  const target = confirmDistance * 2;
+  const target = confirmDistance * 1;
   const nextCardTranslateY = pan.y.interpolate({
     inputRange: [-target - 1, -target, 0, target, target + 1],
     outputRange: [0, 0, 10, 0, 0],
@@ -107,7 +107,6 @@ const Pile = (props) => {
 
   const showNextCard = () => {
     pan.setValue({ x: 0, y: 0 });
-    //fadeAnim.setValue(0);
     cardColor.setValue(0);
 
     if (cards.length > 0) {
@@ -132,7 +131,7 @@ const Pile = (props) => {
     showNextCard();
   }, [cards]);
 
-  const nextCard = cards[cards.length - 1] || { title: "", subtitle: "" };
+  const nextCard = cards[cards.length - 1] || { title: '', subtitle: '' };
 
   return (
     <>
@@ -179,8 +178,8 @@ const Pile = (props) => {
             }}
           >
             <Card
-              title={""}
-              subtitle={""}
+              title={''}
+              subtitle={''}
               color={new Animated.Value(0)} // Always black
             ></Card>
           </Animated.View>
@@ -190,8 +189,8 @@ const Pile = (props) => {
         <Animated.View
           style={{
             flex: 3,
-            alignContent: "center",
-            alignItems: "center",
+            alignContent: 'center',
+            alignItems: 'center',
             zIndex: 0,
             opacity: emptyMessageOpacity,
           }}
@@ -211,18 +210,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   header: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     padding: 20,
     paddingLeft: 30,
     paddingTop: 50,
-    width: "100%",
+    width: '100%',
   },
   logo: {
-    fontFamily: "American Typewriter",
+    fontFamily: 'American Typewriter',
     fontSize: 28,
-    fontWeight: "500",
-    color: "#BBB",
+    fontWeight: '500',
+    color: '#BBB',
     textShadowOffset: {
       width: 1,
       height: 2,
@@ -237,26 +236,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   emptyMessageText: {
-    fontFamily: "Avenir",
+    fontFamily: 'Avenir',
     fontSize: 22,
-    fontWeight: "500",
+    fontWeight: '500',
   },
   newButton: {
-    position: "absolute",
+    position: 'absolute',
     right: 10,
     bottom: 50,
   },
   nextCard: {
     flex: 1,
-    width: "100%",
-    position: "absolute",
+    width: '100%',
+    position: 'absolute',
     zIndex: -10,
     padding: 0,
   },
   thirdCard: {
     flex: 1,
-    width: "100%",
-    position: "absolute",
+    width: '100%',
+    position: 'absolute',
     zIndex: -11,
   },
 });
