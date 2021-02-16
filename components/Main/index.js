@@ -1,15 +1,20 @@
-import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
-import { Header, Icon } from "react-native-elements";
-import * as Haptics from "expo-haptics";
+import React, { useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View } from 'react-native';
+import { Header, Icon } from 'react-native-elements';
+import * as Haptics from 'expo-haptics';
 
-import Pile from "../../components/Pile";
-import CreateView from "../../components/CreateView";
+import Pile from '../../components/Pile';
+import CreateView from '../../components/CreateView';
 
 const Main = (props) => {
   const [createViewVisible, setCreateViewVisible] = useState(false);
   const { cards, refresh } = props;
+
+  const onRefreshPressed = () => {
+    Haptics.impactAsync();
+    refresh();
+  };
 
   const showCreateView = () => {
     Haptics.impactAsync();
@@ -26,10 +31,10 @@ const Main = (props) => {
       <Header
         barStyle="light-content"
         placement="center"
-        centerComponent={{ text: "yizi", style: styles.logo }}
+        centerComponent={{ text: 'yizi', style: styles.logo }}
         containerStyle={{
-          backgroundColor: "#FFF",
-          justifyContent: "space-around",
+          backgroundColor: '#FFF',
+          justifyContent: 'space-around',
           borderBottomWidth: 0,
           paddingVertical: 20,
         }}
@@ -43,7 +48,7 @@ const Main = (props) => {
           reverseColor="black"
           type="feather"
           name="refresh-ccw"
-          onPress={props.refresh}
+          onPress={onRefreshPressed}
         />
         <Icon
           reverse
@@ -66,18 +71,18 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   header: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     padding: 20,
     paddingLeft: 30,
     paddingTop: 50,
-    width: "100%",
+    width: '100%',
   },
   logo: {
-    fontFamily: "American Typewriter",
+    fontFamily: 'American Typewriter',
     fontSize: 28,
-    fontWeight: "500",
-    color: "#BBB",
+    fontWeight: '500',
+    color: '#BBB',
     textShadowOffset: {
       width: 1,
       height: 2,
@@ -93,11 +98,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   emptyMessageText: {
-    fontFamily: "Avenir",
+    fontFamily: 'Avenir',
     fontSize: 22,
-    fontWeight: "500",
+    fontWeight: '500',
   },
-  icons: { position: "absolute", right: 10, bottom: 50, zIndex: 10 },
+  icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
 });
 
 export default Main;
