@@ -6,7 +6,7 @@ import {
   PanResponder,
   Text,
   Image,
-  Easing,
+  Pressable,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
@@ -30,9 +30,11 @@ const Pile = (props) => {
 
   const initialState = { title: '', subtitle: '' };
   const [card, setCard] = useState(initialState);
+  const [revealed, setRevealed] = useState(false);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
   const emptyMessageOpacity = useRef(new Animated.Value(0)).current;
   const cardColor = useRef(new Animated.Value(0)).current;
 
@@ -40,7 +42,10 @@ const Pile = (props) => {
   const dismissTarget = 1000;
 
   const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => true,
+    onStartShouldSetPanResponder: () => false,
+    onMoveShouldSetPanResponder: (e, gestureState) => {
+      return Math.abs(gestureState.dx) >= 1 || Math.abs(gestureState.dy) >= 1;
+    },
     onPanResponderMove: (e, gestureState) => {
       const { dy } = gestureState;
       const d = Math.abs(dy);
@@ -108,6 +113,7 @@ const Pile = (props) => {
   const showNextCard = () => {
     pan.setValue({ x: 0, y: 0 });
     cardColor.setValue(0);
+    setRevealed(false);
 
     if (cards.length > 0) {
       const n = cards.pop();
@@ -127,6 +133,25 @@ const Pile = (props) => {
     }
   };
 
+  animateCardPressIn = () => {
+    !revealed && Haptics.selectionAsync();
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      speed: 20,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  animateCardPressOut = () => {
+    !revealed && Haptics.selectionAsync();
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      bounciness: 22,
+      speed: 100,
+    }).start();
+  };
+
   useEffect(() => {
     showNextCard();
   }, [cards]);
@@ -138,16 +163,29 @@ const Pile = (props) => {
       <View style={styles.container}>
         <Animated.View
           style={{
-            transform: [{ translateX: pan.x }, { translateY: pan.y }],
+            transform: [
+              { translateX: pan.x },
+              { translateY: pan.y },
+              { scale: scaleAnim },
+            ],
             opacity: fadeAnim,
           }}
           {...panResponder.panHandlers}
         >
-          <Card
-            title={card.title}
-            subtitle={card.subtitle}
-            color={cardColor}
-          ></Card>
+          <Pressable
+            onPressIn={animateCardPressIn}
+            onPressOut={animateCardPressOut}
+            onPress={() => {
+              setRevealed(true);
+            }}
+          >
+            <Card
+              title={card.title}
+              subtitle={card.subtitle}
+              color={cardColor}
+              revealed={revealed}
+            ></Card>
+          </Pressable>
         </Animated.View>
         <View style={styles.nextCard}>
           <Animated.View
@@ -162,7 +200,8 @@ const Pile = (props) => {
             <Card
               title={nextCard.title}
               subtitle={nextCard.subtitle}
-              color={new Animated.Value(0)} // Always black
+              color={new Animated.Value(0)}
+              revealed={false}
             ></Card>
           </Animated.View>
         </View>
@@ -180,7 +219,8 @@ const Pile = (props) => {
             <Card
               title={''}
               subtitle={''}
-              color={new Animated.Value(0)} // Always black
+              color={new Animated.Value(0)}
+              revealed={false}
             ></Card>
           </Animated.View>
         </View>

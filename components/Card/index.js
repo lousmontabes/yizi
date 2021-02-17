@@ -1,8 +1,14 @@
-import React from 'react';
-import { Animated, SafeAreaView, View, StyleSheet, Text } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, View, StyleSheet } from 'react-native';
 
 const Card = (props) => {
-  const { title, subtitle, color } = props;
+  const { title, subtitle, color, revealed } = props;
+  const revealAnim = useRef(new Animated.Value(0)).current;
+
+  const revealScale = revealAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.9, 1],
+  });
 
   // TODO: Move this to constants
   const colors = {
@@ -26,11 +32,28 @@ const Card = (props) => {
     color: textColor,
   };
 
+  useEffect(() => {
+    if (revealed) {
+      Animated.spring(revealAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        bounciness: 20,
+        speed: 100,
+      }).start();
+    } else {
+      revealAnim.setValue(0);
+    }
+  }, [revealed]);
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <Animated.Text style={titleStyle}>{title}</Animated.Text>
-        <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
+        <Animated.View
+          style={{ opacity: revealAnim, transform: [{ scale: revealScale }] }}
+        >
+          <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
+        </Animated.View>
       </View>
     </View>
   );
