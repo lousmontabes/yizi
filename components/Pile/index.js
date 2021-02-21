@@ -31,10 +31,11 @@ const Pile = (props) => {
   const initialState = { title: '', subtitle: '' };
   const [card, setCard] = useState(initialState);
   const [revealed, setRevealed] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const pressAnim = useRef(new Animated.Value(1)).current;
   const emptyMessageOpacity = useRef(new Animated.Value(0)).current;
   const cardColor = useRef(new Animated.Value(0)).current;
 
@@ -49,6 +50,8 @@ const Pile = (props) => {
     onPanResponderMove: (e, gestureState) => {
       const { dy } = gestureState;
       const d = Math.abs(dy);
+
+      editMode && setEditMode(false);
 
       if (d > confirmDistance && prevD < confirmDistance) {
         Haptics.selectionAsync();
@@ -81,16 +84,20 @@ const Pile = (props) => {
           { toValue: { x: 0, y: 0 }, useNativeDriver: true } // Back to zero
         ).start();
       } else {
-        Animated.timing(pan, {
-          toValue: { x: 0, y: y > 0 ? dismissTarget : -dismissTarget },
-          duration: 150,
-          useNativeDriver: true,
-        }).start(() => {
-          showNextCard();
-        });
+        dismissCard(y < 0);
       }
     },
   });
+
+  const dismissCard = (up = true) => {
+    Animated.timing(pan, {
+      toValue: { x: 0, y: up ? -dismissTarget : dismissTarget },
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => {
+      showNextCard();
+    });
+  };
 
   const target = confirmDistance * 1;
   const nextCardTranslateY = pan.y.interpolate({
@@ -110,10 +117,15 @@ const Pile = (props) => {
     outputRange: [1, 1, 0, 1, 1],
   });
 
-  const showNextCard = () => {
+  const resetCard = () => {
     pan.setValue({ x: 0, y: 0 });
     cardColor.setValue(0);
     setRevealed(false);
+    setEditMode(false);
+  };
+
+  const showNextCard = () => {
+    resetCard();
 
     if (cards.length > 0) {
       const n = cards.pop();
@@ -134,22 +146,31 @@ const Pile = (props) => {
   };
 
   animateCardPressIn = () => {
-    !revealed && Haptics.selectionAsync();
-    Animated.spring(scaleAnim, {
-      toValue: 0.98,
+    Animated.spring(pressAnim, {
+      toValue: 1,
       speed: 20,
       useNativeDriver: true,
     }).start();
   };
 
   animateCardPressOut = () => {
-    !revealed && Haptics.selectionAsync();
-    Animated.spring(scaleAnim, {
-      toValue: 1,
+    Animated.spring(pressAnim, {
+      toValue: 0,
       useNativeDriver: true,
-      bounciness: 22,
+      bounciness: true ? 0 : 22,
       speed: 100,
     }).start();
+  };
+
+  const pressResponse = {
+    scale: pressAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0.98],
+    }),
+    translateY: pressAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 5],
+    }),
   };
 
   useEffect(() => {
@@ -165,8 +186,8 @@ const Pile = (props) => {
           style={{
             transform: [
               { translateX: pan.x },
-              { translateY: pan.y },
-              { scale: scaleAnim },
+              { translateY: Animated.add(pan.y, pressResponse.translateY) },
+              { scale: pressResponse.scale },
             ],
             opacity: fadeAnim,
           }}
@@ -176,7 +197,17 @@ const Pile = (props) => {
             onPressIn={animateCardPressIn}
             onPressOut={animateCardPressOut}
             onPress={() => {
-              setRevealed(true);
+              Haptics.selectionAsync();
+              if (editMode) {
+                setEditMode(false);
+              } else {
+                setRevealed(true);
+              }
+            }}
+            onLongPress={() => {
+              animateCardPressOut();
+              Haptics.selectionAsync();
+              setEditMode(!editMode);
             }}
           >
             <Card
@@ -184,6 +215,9 @@ const Pile = (props) => {
               subtitle={card.subtitle}
               color={cardColor}
               revealed={revealed}
+              editMode={editMode}
+              onDelete={dismissCard}
+              onFinishEditing={() => setEditMode(false)}
             ></Card>
           </Pressable>
         </Animated.View>

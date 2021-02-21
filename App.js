@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { StyleSheet, SafeAreaView } from "react-native";
-import Main from "./components/Main";
-import { getData, clear } from "./utils/storage";
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, SafeAreaView } from 'react-native';
+import Main from './components/Main';
+import storage from './utils/storage';
 
 const App = () => {
   const [cards, setCards] = useState([]);
 
   const loadItems = () => {
-    getData().then((data) => {
+    storage.getItems().then((data) => {
       setCards(data);
     });
   };

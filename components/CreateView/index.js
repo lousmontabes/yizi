@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
-  TextInput,
   KeyboardAvoidingView,
   Animated,
   PanResponder,
@@ -11,7 +10,9 @@ import { Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import { confirmDistance } from '../../constants';
-import { storeData, getData } from '../../utils/storage';
+import storage from '../../utils/storage';
+
+import ItemForm from '../ItemForm';
 
 const CreateView = (props) => {
   const [title, setTitle] = useState('');
@@ -21,36 +22,6 @@ const CreateView = (props) => {
   const pan = useRef(new Animated.Value(0)).current;
   const nextAnim = useRef(new Animated.Value(1)).current;
   const nextOpacity = useRef(new Animated.Value(1)).current;
-  const titleShake = useRef(new Animated.Value(0)).current;
-  const subtitleShake = useRef(new Animated.Value(0)).current;
-
-  const startShake = (shakeAnimation) => {
-    Animated.sequence([
-      Animated.timing(shakeAnimation, {
-        toValue: 10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimation, {
-        toValue: -10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimation, {
-        toValue: 10,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shakeAnimation, {
-        toValue: 0,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const titleInputRef = useRef();
-  const subtitleInputRef = useRef();
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -81,9 +52,6 @@ const CreateView = (props) => {
   }, [fadeAnim]);
 
   const hideView = (itemAdded) => {
-    titleInputRef.current.isFocused() && titleInputRef.current.blur();
-    subtitleInputRef.current.isFocused() && subtitleInputRef.current.blur();
-
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -100,38 +68,12 @@ const CreateView = (props) => {
     });
   };
 
-  const presentInput = (input) => {
-    return input.trimLeft().replace('\n', '');
-  };
-
-  const sanitizeInput = (input) => {
-    return input.trim().replace('\n', '');
-  };
-
-  const isInputValid = (input) => {
-    return input.trim() !== '';
-  };
-
   const submitItem = () => {
-    const isTitleValid = isInputValid(title);
-    const isSubtitleValid = isInputValid(subtitle);
-
-    if (isTitleValid && isSubtitleValid) {
-      Haptics.impactAsync();
-
-      getData().then((currentItems) => {
-        currentItems.push({
-          title: sanitizeInput(title),
-          subtitle: sanitizeInput(subtitle),
-        });
-        storeData(currentItems);
-      });
-      showNextInput();
-    } else {
-      !isTitleValid && startShake(titleShake);
-      !isSubtitleValid && startShake(subtitleShake);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-    }
+    storage.addItem({
+      title: sanitizeInput(title),
+      subtitle: sanitizeInput(subtitle),
+    });
+    showNextInput();
   };
 
   const showNextInput = () => {
@@ -141,7 +83,7 @@ const CreateView = (props) => {
       useNativeDriver: true,
     }).start(() => {
       resetInputs();
-      titleInputRef.current.focus();
+      //titleInputRef.current.focus();
       nextAnim.setValue(1);
       nextOpacity.setValue(0);
       Animated.timing(nextOpacity, {
@@ -152,13 +94,13 @@ const CreateView = (props) => {
     });
   };
 
+  const sanitizeInput = (input) => {
+    return input.trim().replace('\n', '');
+  };
+
   const resetInputs = () => {
     setTitle('');
     setSubtitle('');
-  };
-
-  const onSubmitTitle = () => {
-    subtitleInputRef.current.focus();
   };
 
   return (
@@ -180,47 +122,13 @@ const CreateView = (props) => {
               opacity: nextOpacity,
             }}
           >
-            <Animated.View
-              style={{
-                transform: [{ translateX: titleShake }],
-              }}
-            >
-              <TextInput
-                autoFocus
-                ref={titleInputRef}
-                value={title}
-                maxLength={25}
-                onChangeText={(text) => setTitle(presentInput(text))}
-                onSubmitEditing={onSubmitTitle}
-                placeholder="New yizi"
-                placeholderTextColor="#999"
-                selectionColor={'#000'}
-                style={styles.titleInput}
-                returnKeyType="next"
-                spellCheck={false}
-              />
-            </Animated.View>
-            <Animated.View
-              style={{
-                transform: [{ translateX: subtitleShake }],
-              }}
-            >
-              <TextInput
-                ref={subtitleInputRef}
-                value={subtitle}
-                maxLength={50}
-                multiline={true}
-                onChangeText={(text) => setSubtitle(presentInput(text))}
-                onSubmitEditing={submitItem}
-                placeholder="Its deep meaning"
-                placeholderTextColor="#999"
-                selectionColor={'#000'}
-                style={styles.subtitleInput}
-                enablesReturnKeyAutomatically
-                returnKeyType="done"
-                scrollEnabled={false}
-              />
-            </Animated.View>
+            <ItemForm
+              onSubmit={submitItem}
+              onChangeTitle={(value) => setTitle(value)}
+              onChangeSubtitle={(value) => setSubtitle(value)}
+              title={title}
+              subtitle={subtitle}
+            />
           </Animated.View>
           <View style={styles.icons}>
             <Icon
@@ -270,19 +178,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     zIndex: 34,
-  },
-  titleInput: {
-    textAlign: 'center',
-    fontSize: 42,
-    fontFamily: 'Avenir',
-    fontWeight: '500',
-    marginHorizontal: 15,
-  },
-  subtitleInput: {
-    textAlign: 'center',
-    fontSize: 28,
-    fontFamily: 'Avenir',
-    marginHorizontal: 15,
   },
   newButton: {},
   icons: { position: 'absolute', right: 10, bottom: 10 },
