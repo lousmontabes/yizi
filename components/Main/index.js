@@ -1,11 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View } from 'react-native';
+import { Animated, StyleSheet, View, Text } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import Pile from '../../components/Pile';
 import CreateView from '../../components/CreateView';
+
+const EmptyState = () => {
+  return (
+    <>
+      <View
+        style={{
+          height: 500,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Icon size={32} type="feather" name="book-open" />
+        <Text style={styles.emptyMessageText}>
+          You don't have any yizis yet
+        </Text>
+        <Text style={styles.emptyMessageSubtitle}>
+          Tap the button to add your first yizi
+        </Text>
+      </View>
+    </>
+  );
+};
 
 const Main = (props) => {
   const [createViewVisible, setCreateViewVisible] = useState(false);
@@ -39,7 +61,8 @@ const Main = (props) => {
           paddingVertical: 20,
         }}
       />
-      <Pile cards={cards}></Pile>
+      {!!cards.length && <Pile cards={cards}></Pile>}
+      {!cards.length && <EmptyState></EmptyState>}
       <View style={styles.icons}>
         <Icon
           size={28}

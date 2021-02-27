@@ -8,6 +8,7 @@ import {
   Image,
   Pressable,
 } from 'react-native';
+import { Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import Card from '../Card';
@@ -15,8 +16,12 @@ import { confirmDistance } from '../../constants';
 
 const EmptyMessage = () => {
   return (
-    <View>
-      <Image style={styles.komo} source={require('../../assets/komo.webp')} />
+    <View
+      style={{
+        alignItems: 'center',
+      }}
+    >
+      <Icon size={32} type="feather" name="check" />
       <Text style={styles.emptyMessageText}>You've learnt a lot!</Text>
       <Text style={styles.emptyMessageSubtitle}>
         You've gone through all your Yizis.
@@ -177,8 +182,8 @@ const Pile = (props) => {
   const nextCard = cards[cards.length - 1] || { title: '', subtitle: '' };
 
   return (
-    <>
-      <View style={[styles.container, { opacity: empty ? 0 : 1 }]}>
+    <View style={styles.container}>
+      <View style={{ opacity: empty ? 0 : 1 }}>
         <Animated.View
           style={{
             transform: [
@@ -260,19 +265,18 @@ const Pile = (props) => {
           </View>
         )}
       </View>
-      {cards.length === 0 && (
-        <Animated.View
-          style={{
-            flex: 3,
-            alignContent: 'center',
-            alignItems: 'center',
-            zIndex: 0,
-          }}
-        >
-          <EmptyMessage></EmptyMessage>
-        </Animated.View>
-      )}
-    </>
+      <Animated.View
+        style={{
+          height: 500,
+          alignContent: 'center',
+          alignItems: 'center',
+          zIndex: -1,
+          justifyContent: 'center',
+        }}
+      >
+        <EmptyMessage></EmptyMessage>
+      </Animated.View>
+    </View>
   );
 };
 

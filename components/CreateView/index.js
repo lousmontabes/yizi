@@ -74,6 +74,7 @@ const CreateView = (props) => {
       subtitle: sanitizeInput(subtitle),
     });
     showNextInput();
+    Haptics.impactAsync();
   };
 
   const showNextInput = () => {
