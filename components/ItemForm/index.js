@@ -1,9 +1,17 @@
-import React, { useRef } from 'react';
-
+import React, { useRef, useEffect } from 'react';
 import { StyleSheet, TextInput, Animated } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const ItemForm = (props) => {
-  const { onChangeTitle, onChangeSubtitle, onSubmit, title, subtitle } = props;
+  const {
+    onChangeTitle,
+    onChangeSubtitle,
+    onSubmit,
+    title,
+    subtitle,
+    revealed = false,
+    editable,
+  } = props;
 
   const titleShake = useRef(new Animated.Value(0)).current;
   const subtitleShake = useRef(new Animated.Value(0)).current;
@@ -62,6 +70,10 @@ const ItemForm = (props) => {
     }
   };
 
+  useEffect(() => {
+    editable && titleInputRef.current.focus();
+  }, [editable]);
+
   return (
     <>
       <Animated.View
@@ -70,7 +82,6 @@ const ItemForm = (props) => {
         }}
       >
         <TextInput
-          autoFocus
           ref={titleInputRef}
           value={title}
           maxLength={25}
@@ -84,11 +95,13 @@ const ItemForm = (props) => {
           style={styles.titleInput}
           returnKeyType="next"
           spellCheck={false}
+          editable={editable}
         />
       </Animated.View>
       <Animated.View
         style={{
           transform: [{ translateX: subtitleShake }],
+          opacity: revealed ? 1 : 0,
         }}
       >
         <TextInput
@@ -107,6 +120,7 @@ const ItemForm = (props) => {
           enablesReturnKeyAutomatically
           returnKeyType="done"
           scrollEnabled={false}
+          editable={editable}
         />
       </Animated.View>
     </>

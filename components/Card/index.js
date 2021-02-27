@@ -14,7 +14,14 @@ const colors = {
 };
 
 const EditView = (props) => {
-  const { title, subtitle, onDelete, onFinishEditing } = props;
+  const {
+    title,
+    subtitle,
+    onDelete,
+    onFinishEditing,
+    revealed,
+    editable,
+  } = props;
 
   const [newTitle, setNewTitle] = useState(title);
   const [newSubtitle, setNewSubtitle] = useState(subtitle);
@@ -50,12 +57,27 @@ const EditView = (props) => {
   };
 
   useEffect(() => {
-    Animated.timing(fadeInAnim, {
-      toValue: 1,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+    // TODO: This causes the refresh to lag too much.
+    // show title and subtitle instead while editMode is off
+    setNewTitle(title);
+    setNewSubtitle(subtitle);
+  }, [title, subtitle]);
+
+  useEffect(() => {
+    if (editable) {
+      Animated.timing(fadeInAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(fadeInAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [editable]);
 
   return (
     <>
@@ -79,6 +101,8 @@ const EditView = (props) => {
         onChangeTitle={setNewTitle}
         onChangeSubtitle={setNewSubtitle}
         onSubmit={onSubmit}
+        editable={editable}
+        revealed={revealed || editable}
       />
     </>
   );
@@ -132,16 +156,15 @@ const Card = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {editMode && (
-          <EditView
-            title={title}
-            subtitle={subtitle}
-            onDelete={onDelete}
-            revealed={revealed}
-            onFinishEditing={onFinishEditing}
-          />
-        )}
-        {!editMode && (
+        <EditView
+          title={title}
+          subtitle={subtitle}
+          onDelete={onDelete}
+          revealed={revealed}
+          editable={editMode}
+          onFinishEditing={onFinishEditing}
+        />
+        {/* 
           <>
             <Animated.Text style={titleStyle}>{title}</Animated.Text>
             <Animated.View
@@ -153,7 +176,7 @@ const Card = (props) => {
               <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
             </Animated.View>
           </>
-        )}
+         */}
       </View>
     </View>
   );

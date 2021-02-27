@@ -128,8 +128,8 @@ const Pile = (props) => {
     resetCard();
 
     if (cards.length > 0) {
-      const n = cards.pop();
-      setCard(n);
+      const newCard = cards.pop();
+      setCard(newCard);
 
       Animated.timing(fadeAnim, {
         toValue: 1,
