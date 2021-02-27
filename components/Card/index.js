@@ -48,17 +48,28 @@ const EditView = (props) => {
     );
   };
 
+  const onChangeTitle = (text) => {
+    setNewTitle(text);
+    storeChanges();
+  };
+
+  const onChangeSubtitle = (text) => {
+    setNewSubtitle(text);
+    storeChanges();
+  };
+
   const onSubmit = () => {
+    onFinishEditing();
+  };
+
+  const storeChanges = () => {
     storage.modifyItem(
       { title, subtitle },
       { title: newTitle, subtitle: newSubtitle }
     );
-    onFinishEditing();
   };
 
   useEffect(() => {
-    // TODO: This causes the refresh to lag too much.
-    // show title and subtitle instead while editMode is off
     setNewTitle(title);
     setNewSubtitle(subtitle);
   }, [title, subtitle]);
@@ -96,10 +107,10 @@ const EditView = (props) => {
         />
       </Animated.View>
       <ItemForm
-        title={newTitle}
-        subtitle={newSubtitle}
-        onChangeTitle={setNewTitle}
-        onChangeSubtitle={setNewSubtitle}
+        title={editable ? newTitle : title}
+        subtitle={editable ? newSubtitle : subtitle}
+        onChangeTitle={onChangeTitle}
+        onChangeSubtitle={onChangeSubtitle}
         onSubmit={onSubmit}
         editable={editable}
         revealed={revealed || editable}
@@ -130,29 +141,6 @@ const Card = (props) => {
     outputRange: [colors.red, colors.black, colors.green],
   });
 
-  const titleStyle = {
-    ...StyleSheet.flatten(styles.title),
-    color: textColor,
-  };
-
-  const descriptionStyle = {
-    ...StyleSheet.flatten(styles.description),
-    color: textColor,
-  };
-
-  useEffect(() => {
-    if (revealed) {
-      Animated.spring(revealAnim, {
-        toValue: 1,
-        useNativeDriver: true,
-        bounciness: 20,
-        speed: 100,
-      }).start();
-    } else {
-      revealAnim.setValue(0);
-    }
-  }, [revealed, editMode]);
-
   return (
     <View style={styles.container}>
       <View style={styles.card}>
@@ -164,19 +152,6 @@ const Card = (props) => {
           editable={editMode}
           onFinishEditing={onFinishEditing}
         />
-        {/* 
-          <>
-            <Animated.Text style={titleStyle}>{title}</Animated.Text>
-            <Animated.View
-              style={{
-                opacity: revealAnim,
-                transform: [{ scale: revealScale }],
-              }}
-            >
-              <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
-            </Animated.View>
-          </>
-         */}
       </View>
     </View>
   );
