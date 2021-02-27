@@ -38,6 +38,7 @@ const EditView = (props) => {
         {
           text: 'Delete',
           onPress: () => {
+            fadeInAnim.setValue(0);
             storage.deleteItem({ title, subtitle });
             onDelete();
           },
