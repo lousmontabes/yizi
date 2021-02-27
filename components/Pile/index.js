@@ -32,11 +32,11 @@ const Pile = (props) => {
   const [card, setCard] = useState(initialState);
   const [revealed, setRevealed] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [empty, setEmpty] = useState(false);
 
   const pan = useRef(new Animated.ValueXY()).current;
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const pressAnim = useRef(new Animated.Value(1)).current;
-  const emptyMessageOpacity = useRef(new Animated.Value(0)).current;
   const cardColor = useRef(new Animated.Value(0)).current;
 
   let prevD = 0;
@@ -137,11 +137,7 @@ const Pile = (props) => {
         useNativeDriver: true,
       }).start();
     } else {
-      Animated.timing(emptyMessageOpacity, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
+      setEmpty(true);
     }
   };
 
@@ -174,6 +170,7 @@ const Pile = (props) => {
   };
 
   useEffect(() => {
+    setEmpty(false);
     showNextCard();
   }, [cards]);
 
@@ -181,7 +178,7 @@ const Pile = (props) => {
 
   return (
     <>
-      <View style={styles.container}>
+      <View style={[styles.container, { opacity: empty ? 0 : 1 }]}>
         <Animated.View
           style={{
             transform: [
@@ -221,43 +218,47 @@ const Pile = (props) => {
             ></Card>
           </Pressable>
         </Animated.View>
-        <View style={styles.nextCard}>
-          <Animated.View
-            style={{
-              transform: [
-                { translateX: nextCardTranslateX },
-                { translateY: nextCardTranslateY },
-                { rotate: nextCardRotation },
-              ],
-            }}
-          >
-            <Card
-              title={nextCard.title}
-              subtitle={nextCard.subtitle}
-              color={new Animated.Value(0)}
-              revealed={false}
-            ></Card>
-          </Animated.View>
-        </View>
-        <View style={styles.thirdCard}>
-          <Animated.View
-            style={{
-              transform: [
-                { translateX: 0 },
-                { translateY: 10 },
-                { rotate: 0.03 },
-              ],
-              opacity: thirdCardOpacity,
-            }}
-          >
-            <Card
-              title={''}
-              subtitle={''}
-              color={new Animated.Value(0)}
-              revealed={false}
-            ></Card>
-          </Animated.View>
-        </View>
+        {cards.length > 0 && (
+          <View style={styles.nextCard}>
+            <Animated.View
+              style={{
+                transform: [
+                  { translateX: nextCardTranslateX },
+                  { translateY: nextCardTranslateY },
+                  { rotate: nextCardRotation },
+                ],
+              }}
+            >
+              <Card
+                title={nextCard.title}
+                subtitle={nextCard.subtitle}
+                color={new Animated.Value(0)}
+                revealed={false}
+              ></Card>
+            </Animated.View>
+          </View>
+        )}
+        {cards.length > 1 && (
+          <View style={styles.thirdCard}>
+            <Animated.View
+              style={{
+                transform: [
+                  { translateX: 0 },
+                  { translateY: 10 },
+                  { rotate: 0.03 },
+                ],
+                opacity: thirdCardOpacity,
+              }}
+            >
+              <Card
+                title={''}
+                subtitle={''}
+                color={new Animated.Value(0)}
+                revealed={false}
+              ></Card>
+            </Animated.View>
+          </View>
+        )}
       </View>
       {cards.length === 0 && (
         <Animated.View
@@ -266,7 +267,6 @@ const Pile = (props) => {
             alignContent: 'center',
             alignItems: 'center',
             zIndex: 0,
-            opacity: emptyMessageOpacity,
           }}
         >
           <EmptyMessage></EmptyMessage>
