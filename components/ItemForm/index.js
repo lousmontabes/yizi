@@ -1,10 +1,19 @@
-import React, { useRef } from 'react';
-
+import React, { useRef, useEffect } from 'react';
 import { StyleSheet, TextInput, Animated } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const ItemForm = (props) => {
-  const { onChangeTitle, onChangeSubtitle, onSubmit, title, subtitle } = props;
+  const {
+    onChangeTitle,
+    onChangeSubtitle,
+    onSubmit,
+    title,
+    subtitle,
+    revealed,
+    editable,
+  } = props;
 
+  const fadeInAnim = useRef(new Animated.Value(0)).current;
   const titleShake = useRef(new Animated.Value(0)).current;
   const subtitleShake = useRef(new Animated.Value(0)).current;
 
@@ -44,23 +53,21 @@ const ItemForm = (props) => {
     subtitleInputRef.current.focus();
   };
 
-  const isInputValid = (input) => {
-    return input.trim() !== '';
-  };
+  useEffect(() => {
+    editable && titleInputRef.current.focus();
+  }, [editable]);
 
-  const submit = () => {
-    const isTitleValid = isInputValid(title);
-    const isSubtitleValid = isInputValid(subtitle);
-
-    if (isTitleValid && isSubtitleValid) {
-      Haptics.impactAsync();
-      onSubmit();
+  useEffect(() => {
+    if (revealed) {
+      Animated.timing(fadeInAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
     } else {
-      !isTitleValid && startShake(titleShake);
-      !isSubtitleValid && startShake(subtitleShake);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      fadeInAnim.setValue(0);
     }
-  };
+  }, [revealed]);
 
   return (
     <>
@@ -70,7 +77,6 @@ const ItemForm = (props) => {
         }}
       >
         <TextInput
-          autoFocus
           ref={titleInputRef}
           value={title}
           maxLength={25}
@@ -84,11 +90,14 @@ const ItemForm = (props) => {
           style={styles.titleInput}
           returnKeyType="next"
           spellCheck={false}
+          editable={editable}
+          pointerEvents={editable ? 'auto' : 'none'}
         />
       </Animated.View>
       <Animated.View
         style={{
           transform: [{ translateX: subtitleShake }],
+          opacity: fadeInAnim,
         }}
       >
         <TextInput
@@ -99,7 +108,7 @@ const ItemForm = (props) => {
           onChangeText={(text) => {
             onChangeSubtitle(presentInput(text));
           }}
-          onSubmitEditing={submit}
+          onSubmitEditing={onSubmit}
           placeholder="Its deep meaning"
           placeholderTextColor="#999"
           selectionColor={'#000'}
@@ -107,6 +116,8 @@ const ItemForm = (props) => {
           enablesReturnKeyAutomatically
           returnKeyType="done"
           scrollEnabled={false}
+          editable={editable}
+          pointerEvents={editable ? 'auto' : 'none'}
         />
       </Animated.View>
     </>

@@ -68,6 +68,24 @@ const CreateView = (props) => {
     });
   };
 
+  const isInputValid = (input) => {
+    return input.trim() !== '';
+  };
+
+  const onSubmit = () => {
+    const isTitleValid = isInputValid(title);
+    const isSubtitleValid = isInputValid(subtitle);
+
+    if (isTitleValid && isSubtitleValid) {
+      Haptics.impactAsync();
+      submitItem();
+    } else {
+      /* !isTitleValid && startShake(titleShake);
+      !isSubtitleValid && startShake(subtitleShake); */
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+  };
+
   const submitItem = () => {
     storage.addItem({
       title: sanitizeInput(title),
@@ -128,6 +146,8 @@ const CreateView = (props) => {
               onChangeSubtitle={(value) => setSubtitle(value)}
               title={title}
               subtitle={subtitle}
+              revealed={true}
+              editable={true}
             />
           </Animated.View>
           <View style={styles.icons}>

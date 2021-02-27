@@ -14,7 +14,14 @@ const colors = {
 };
 
 const EditView = (props) => {
-  const { title, subtitle, onDelete, onFinishEditing } = props;
+  const {
+    title,
+    subtitle,
+    onDelete,
+    onFinishEditing,
+    revealed,
+    editable,
+  } = props;
 
   const [newTitle, setNewTitle] = useState(title);
   const [newSubtitle, setNewSubtitle] = useState(subtitle);
@@ -42,21 +49,47 @@ const EditView = (props) => {
     );
   };
 
+  const onChangeTitle = (text) => {
+    setNewTitle(text);
+    storeChanges();
+  };
+
+  const onChangeSubtitle = (text) => {
+    setNewSubtitle(text);
+    storeChanges();
+  };
+
   const onSubmit = () => {
+    onFinishEditing();
+  };
+
+  const storeChanges = () => {
     storage.modifyItem(
       { title, subtitle },
       { title: newTitle, subtitle: newSubtitle }
     );
-    onFinishEditing();
   };
 
   useEffect(() => {
-    Animated.timing(fadeInAnim, {
-      toValue: 1,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-  }, []);
+    setNewTitle(title);
+    setNewSubtitle(subtitle);
+  }, [title, subtitle]);
+
+  useEffect(() => {
+    if (editable) {
+      Animated.timing(fadeInAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(fadeInAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [editable]);
 
   return (
     <>
@@ -75,11 +108,13 @@ const EditView = (props) => {
         />
       </Animated.View>
       <ItemForm
-        title={newTitle}
-        subtitle={newSubtitle}
-        onChangeTitle={setNewTitle}
-        onChangeSubtitle={setNewSubtitle}
+        title={editable ? newTitle : title}
+        subtitle={editable ? newSubtitle : subtitle}
+        onChangeTitle={onChangeTitle}
+        onChangeSubtitle={onChangeSubtitle}
         onSubmit={onSubmit}
+        editable={editable}
+        revealed={revealed || editable}
       />
     </>
   );
@@ -107,54 +142,17 @@ const Card = (props) => {
     outputRange: [colors.red, colors.black, colors.green],
   });
 
-  const titleStyle = {
-    ...StyleSheet.flatten(styles.title),
-    color: textColor,
-  };
-
-  const descriptionStyle = {
-    ...StyleSheet.flatten(styles.description),
-    color: textColor,
-  };
-
-  useEffect(() => {
-    if (revealed) {
-      Animated.spring(revealAnim, {
-        toValue: 1,
-        useNativeDriver: true,
-        bounciness: 20,
-        speed: 100,
-      }).start();
-    } else {
-      revealAnim.setValue(0);
-    }
-  }, [revealed, editMode]);
-
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {editMode && (
-          <EditView
-            title={title}
-            subtitle={subtitle}
-            onDelete={onDelete}
-            revealed={revealed}
-            onFinishEditing={onFinishEditing}
-          />
-        )}
-        {!editMode && (
-          <>
-            <Animated.Text style={titleStyle}>{title}</Animated.Text>
-            <Animated.View
-              style={{
-                opacity: revealAnim,
-                transform: [{ scale: revealScale }],
-              }}
-            >
-              <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
-            </Animated.View>
-          </>
-        )}
+        <EditView
+          title={title}
+          subtitle={subtitle}
+          onDelete={onDelete}
+          revealed={revealed}
+          editable={editMode}
+          onFinishEditing={onFinishEditing}
+        />
       </View>
     </View>
   );
