@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-
 import { StyleSheet, TextInput, Animated } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 const ItemForm = (props) => {
   const { onChangeTitle, onChangeSubtitle, onSubmit, title, subtitle } = props;
