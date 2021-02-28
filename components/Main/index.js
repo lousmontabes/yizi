@@ -1,11 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Animated, StyleSheet, View, Text } from 'react-native';
+import {
+  Animated,
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import Pile from '../../components/Pile';
 import CreateView from '../../components/CreateView';
+
+const deviceWidth = Dimensions.get('window').width;
 
 const EmptyState = () => {
   return (
@@ -61,8 +70,19 @@ const Main = (props) => {
           paddingVertical: 20,
         }}
       />
-      {!!cards.length && <Pile cards={cards}></Pile>}
-      {!cards.length && <EmptyState></EmptyState>}
+      <ScrollView
+        horizontal={true}
+        pagingEnabled={true}
+        showsHorizontalScrollIndicator={false}
+      >
+        <View style={styles.panel}>
+          <Text>Your yizis</Text>
+        </View>
+        <View style={styles.panel}>
+          {!!cards.length && <Pile cards={cards}></Pile>}
+          {!cards.length && <EmptyState></EmptyState>}
+        </View>
+      </ScrollView>
       <View style={styles.icons}>
         <Icon
           size={28}
@@ -126,6 +146,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
+  panel: { width: deviceWidth },
 });
 
 export default Main;
