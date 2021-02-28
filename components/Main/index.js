@@ -80,7 +80,6 @@ const Main = (props) => {
         pagingEnabled={true}
         showsHorizontalScrollIndicator={false}
         scrollEnabled={!movingPile}
-        scrollEventThrottle={100}
         disableScrollViewPanResponder={true}
       >
         <SafeAreaView style={styles.panel}>
