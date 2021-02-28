@@ -33,6 +33,7 @@ const Pile = (props) => {
   const { cards } = props;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [nextCard, setNextCard] = useState({ title: '', subtitle: '' });
   const [revealed, setRevealed] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [empty, setEmpty] = useState(false);
@@ -127,16 +128,39 @@ const Pile = (props) => {
     setEditMode(false);
   };
 
+  const animatePrevious = (callback = () => {}) => {
+    pan.setValue({ x: 0, y: -dismissTarget });
+    Animated.spring(pan, {
+      toValue: { x: 0, y: 0 },
+      useNativeDriver: true,
+    }).start(callback);
+  };
+
+  const animateNext = (callback = () => {}) => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const showFirstCard = () => {
+    resetCard();
+
+    setCurrentIndex(0);
+    setNextCard(cards[currentIndex]);
+
+    animatePrevious(() => {
+      setNextCard(cards[1]);
+    });
+  };
+
   const showPreviousCard = () => {
     resetCard();
 
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      pan.setValue({ x: 0, y: -dismissTarget });
-      Animated.spring(pan, {
-        toValue: { x: 0, y: 0 },
-        useNativeDriver: true,
-      }).start();
+      animatePrevious();
     }
   };
 
@@ -144,13 +168,10 @@ const Pile = (props) => {
     resetCard();
 
     if (currentIndex < cards.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      const i = currentIndex;
+      setCurrentIndex(i + 1);
 
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
+      animateNext();
     } else {
       setEmpty(true);
     }
@@ -187,11 +208,14 @@ const Pile = (props) => {
   useEffect(() => {
     resetCard();
     setEmpty(false);
-    setCurrentIndex(0);
+    showFirstCard();
   }, [cards]);
 
+  useEffect(() => {
+    currentIndex !== 0 && setNextCard(cards[currentIndex + 1]);
+  }, [currentIndex]);
+
   const card = cards[currentIndex] || { title: '', subtitle: '' };
-  const nextCard = cards[currentIndex + 1] || { title: '', subtitle: '' };
 
   return (
     <View style={styles.container}>
