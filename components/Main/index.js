@@ -7,14 +7,17 @@ import {
   Text,
   ScrollView,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import Pile from '../../components/Pile';
 import CreateView from '../../components/CreateView';
+import ItemsListView from '../../components/ItemsListView';
 
 const deviceWidth = Dimensions.get('window').width;
+const deviceHeight = Dimensions.get('window').height;
 
 const EmptyState = () => {
   return (
@@ -40,7 +43,10 @@ const EmptyState = () => {
 
 const Main = (props) => {
   const [createViewVisible, setCreateViewVisible] = useState(false);
+  const [movingPile, setMovingPile] = useState(false);
   const { cards, refresh } = props;
+
+  const scrollView = useRef();
 
   const onRefreshPressed = () => {
     Haptics.impactAsync();
@@ -57,31 +63,61 @@ const Main = (props) => {
     setCreateViewVisible(false);
   };
 
+  const onStartMovingPile = () => {
+    setMovingPile(true);
+    //scrollView.current.scrollToEnd();
+  };
+
+  const onEndMovingPile = () => {
+    setMovingPile(false);
+  };
+
   return (
     <>
-      <Header
-        barStyle="light-content"
-        placement="center"
-        centerComponent={{ text: 'yizi', style: styles.logo }}
-        containerStyle={{
-          backgroundColor: '#FFF',
-          justifyContent: 'space-around',
-          borderBottomWidth: 0,
-          paddingVertical: 20,
-        }}
-      />
       <ScrollView
+        ref={scrollView}
         horizontal={true}
         pagingEnabled={true}
         showsHorizontalScrollIndicator={false}
+        scrollEnabled={!movingPile}
+        scrollEventThrottle={100}
+        disableScrollViewPanResponder={true}
       >
-        <View style={styles.panel}>
-          <Text>Your yizis</Text>
-        </View>
-        <View style={styles.panel}>
-          {!!cards.length && <Pile cards={cards}></Pile>}
+        <SafeAreaView style={styles.panel}>
+          <Header
+            barStyle="dark-content"
+            placement="left"
+            centerComponent={{ text: 'Your yizis', style: styles.logo2 }}
+            containerStyle={{
+              backgroundColor: '#FFF',
+              justifyContent: 'space-around',
+              borderBottomWidth: 0,
+              paddingVertical: 20,
+            }}
+          />
+          <ItemsListView cards={cards} />
+        </SafeAreaView>
+        <SafeAreaView style={styles.panel}>
+          <Header
+            barStyle="dark-content"
+            placement="center"
+            centerComponent={{ text: 'yizi', style: styles.logo }}
+            containerStyle={{
+              backgroundColor: '#FFF',
+              justifyContent: 'space-around',
+              borderBottomWidth: 0,
+              paddingVertical: 20,
+            }}
+          />
+          {!!cards.length && (
+            <Pile
+              cards={cards}
+              onStartMove={onStartMovingPile}
+              onEndMove={onEndMovingPile}
+            ></Pile>
+          )}
           {!cards.length && <EmptyState></EmptyState>}
-        </View>
+        </SafeAreaView>
       </ScrollView>
       <View style={styles.icons}>
         <Icon
@@ -131,6 +167,18 @@ const styles = StyleSheet.create({
       height: 2,
     },
     textShadowRadius: 0,
+  },
+  logo2: {
+    fontFamily: 'Avenir',
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#000',
+    textShadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    textShadowRadius: 0,
+    marginHorizontal: 8,
   },
   item: { flex: 2 },
   controls: { flex: 1 },

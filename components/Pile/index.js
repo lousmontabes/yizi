@@ -30,7 +30,7 @@ const EmptyMessage = () => {
 };
 
 const Pile = (props) => {
-  const { cards } = props;
+  const { cards, onStartMove, onEndMove } = props;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextCard, setNextCard] = useState({ title: '', subtitle: '' });
@@ -49,12 +49,14 @@ const Pile = (props) => {
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => false,
     onMoveShouldSetPanResponder: (e, gestureState) => {
-      return Math.abs(gestureState.dx) >= 1 || Math.abs(gestureState.dy) >= 1;
+      return Math.abs(gestureState.dy) >= 10;
+    },
+    onPanResponderGrant: () => {
+      onStartMove();
     },
     onPanResponderMove: (e, gestureState) => {
       const { dy } = gestureState;
       const d = Math.abs(dy);
-
       editMode && setEditMode(false);
 
       if (d > confirmDistance && prevD < confirmDistance) {
@@ -81,6 +83,7 @@ const Pile = (props) => {
     onPanResponderRelease: () => {
       const y = pan.y._value;
       const d = Math.abs(y);
+      onEndMove();
 
       if (d < confirmDistance) {
         Animated.spring(
@@ -90,6 +93,9 @@ const Pile = (props) => {
       } else {
         dismissCard(y < 0);
       }
+    },
+    onPanResponderTerminate: () => {
+      onEndMove();
     },
   });
 
@@ -223,7 +229,7 @@ const Pile = (props) => {
         <Animated.View
           style={{
             transform: [
-              { translateX: pan.x },
+              //{ translateX: pan.x },
               { translateY: Animated.add(pan.y, pressResponse.translateY) },
               { scale: pressResponse.scale },
             ],
