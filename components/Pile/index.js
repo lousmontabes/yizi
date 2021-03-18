@@ -5,7 +5,6 @@ import {
   View,
   PanResponder,
   Text,
-  Image,
   Pressable,
 } from 'react-native';
 import { Icon } from 'react-native-elements';
@@ -33,8 +32,8 @@ const EmptyMessage = () => {
 const Pile = (props) => {
   const { cards } = props;
 
-  const initialState = { title: '', subtitle: '' };
-  const [card, setCard] = useState(initialState);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [nextCard, setNextCard] = useState({ title: '', subtitle: '' });
   const [revealed, setRevealed] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [empty, setEmpty] = useState(false);
@@ -129,18 +128,50 @@ const Pile = (props) => {
     setEditMode(false);
   };
 
+  const animatePrevious = (callback = () => {}) => {
+    pan.setValue({ x: 0, y: -dismissTarget });
+    Animated.spring(pan, {
+      toValue: { x: 0, y: 0 },
+      useNativeDriver: true,
+    }).start(callback);
+  };
+
+  const animateNext = (callback = () => {}) => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const showFirstCard = () => {
+    resetCard();
+
+    setCurrentIndex(0);
+    setNextCard(cards[currentIndex]);
+
+    animatePrevious(() => {
+      setNextCard(cards[1]);
+    });
+  };
+
+  const showPreviousCard = () => {
+    resetCard();
+
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+      animatePrevious();
+    }
+  };
+
   const showNextCard = () => {
     resetCard();
 
-    if (cards.length > 0) {
-      const newCard = cards.pop();
-      setCard(newCard);
+    if (currentIndex < cards.length - 1) {
+      const i = currentIndex;
+      setCurrentIndex(i + 1);
 
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }).start();
+      animateNext();
     } else {
       setEmpty(true);
     }
@@ -175,11 +206,16 @@ const Pile = (props) => {
   };
 
   useEffect(() => {
+    resetCard();
     setEmpty(false);
-    showNextCard();
+    showFirstCard();
   }, [cards]);
 
-  const nextCard = cards[cards.length - 1] || { title: '', subtitle: '' };
+  useEffect(() => {
+    currentIndex !== 0 && setNextCard(cards[currentIndex + 1]);
+  }, [currentIndex]);
+
+  const card = cards[currentIndex] || { title: '', subtitle: '' };
 
   return (
     <View style={styles.container}>
@@ -223,7 +259,7 @@ const Pile = (props) => {
             ></Card>
           </Pressable>
         </Animated.View>
-        {cards.length > 0 && (
+        {currentIndex < cards.length - 1 && (
           <View style={styles.nextCard}>
             <Animated.View
               style={{
@@ -243,7 +279,7 @@ const Pile = (props) => {
             </Animated.View>
           </View>
         )}
-        {cards.length > 1 && (
+        {currentIndex < cards.length - 2 && (
           <View style={styles.thirdCard}>
             <Animated.View
               style={{
