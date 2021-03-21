@@ -41,14 +41,13 @@ const deleteItem = async (item) => {
   });
 };
 
-const modifyItem = async (item, newItem) => {
+const modifyItem = async (index, newItem) => {
+  console.log('modifying item', index);
   getItems().then((currentItems) => {
-    const toModify = currentItems.findIndex(
-      ({ title, subtitle }) =>
-        title === item.title && subtitle === item.subtitle
-    );
-    currentItems[toModify].title = newItem.title;
-    currentItems[toModify].subtitle = newItem.subtitle;
+    console.log(currentItems[index]);
+    console.log(newItem);
+    currentItems[index].title = newItem.title;
+    currentItems[index].subtitle = newItem.subtitle;
     storeData(currentItems);
   });
 };

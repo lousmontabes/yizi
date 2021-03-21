@@ -33,6 +33,7 @@ const Pile = (props) => {
   const { cards } = props;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [editedCard, setEditedCard] = useState({ title: '', subtitle: '' });
   const [nextCard, setNextCard] = useState({ title: '', subtitle: '' });
   const [revealed, setRevealed] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -126,6 +127,7 @@ const Pile = (props) => {
     cardColor.setValue(0);
     setRevealed(false);
     setEditMode(false);
+    setEditedCard({ title: '', subtitle: '' });
   };
 
   const animatePrevious = (callback = () => {}) => {
@@ -170,11 +172,16 @@ const Pile = (props) => {
     if (currentIndex < cards.length - 1) {
       const i = currentIndex;
       setCurrentIndex(i + 1);
-
       animateNext();
     } else {
       setEmpty(true);
     }
+  };
+
+  const onCardEdited = (newTitle, newSubtitle) => {
+    console.log(newTitle, newSubtitle);
+    setEditedCard({ title: newTitle, subtitle: newSubtitle });
+    setEditMode(false);
   };
 
   animateCardPressIn = () => {
@@ -249,13 +256,14 @@ const Pile = (props) => {
             }}
           >
             <Card
+              index={currentIndex}
               title={card.title}
               subtitle={card.subtitle}
               color={cardColor}
               revealed={revealed}
               editMode={editMode}
               onDelete={dismissCard}
-              onFinishEditing={() => setEditMode(false)}
+              onFinishEditing={onCardEdited}
             ></Card>
           </Pressable>
         </Animated.View>

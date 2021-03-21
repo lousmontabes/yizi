@@ -15,12 +15,14 @@ const colors = {
 
 const EditView = (props) => {
   const {
+    index,
     title,
     subtitle,
     onDelete,
     onFinishEditing,
     revealed,
     editable,
+    onEdited,
   } = props;
 
   const [newTitle, setNewTitle] = useState(title);
@@ -51,29 +53,29 @@ const EditView = (props) => {
 
   const onChangeTitle = (text) => {
     setNewTitle(text);
-    storeChanges();
   };
 
   const onChangeSubtitle = (text) => {
     setNewSubtitle(text);
-    storeChanges();
   };
 
   const onSubmit = () => {
-    onFinishEditing();
+    onFinishEditing(newTitle, newSubtitle);
   };
 
   const storeChanges = () => {
-    storage.modifyItem(
-      { title, subtitle },
-      { title: newTitle, subtitle: newSubtitle }
-    );
+    storage.modifyItem(index, { title: newTitle, subtitle: newSubtitle });
   };
 
   useEffect(() => {
     setNewTitle(title);
     setNewSubtitle(subtitle);
   }, [title, subtitle]);
+
+  useEffect(() => {
+    storeChanges();
+    onEdited(newTitle, newSubtitle);
+  }, [newTitle, newSubtitle]);
 
   useEffect(() => {
     if (editable) {
@@ -122,6 +124,7 @@ const EditView = (props) => {
 
 const Card = (props) => {
   const {
+    index,
     title,
     subtitle,
     color,
@@ -130,6 +133,10 @@ const Card = (props) => {
     onDelete,
     onFinishEditing,
   } = props;
+
+  const [editedTitle, setEditedTitle] = useState(title);
+  const [editedSubtitle, setEditedSubtitle] = useState(subtitle);
+
   const revealAnim = useRef(new Animated.Value(0)).current;
 
   const revealScale = revealAnim.interpolate({
@@ -142,16 +149,26 @@ const Card = (props) => {
     outputRange: [colors.red, colors.black, colors.green],
   });
 
+  const onEdited = (newTitle, newSubtitle) => {
+    setEditedTitle(newTitle);
+    setEditedSubtitle(newSubtitle);
+  };
+
+  /* useEffect(() => {
+    onEdited(title, subtitle);
+  }, [title, subtitle]); */
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <EditView
-          title={title}
-          subtitle={subtitle}
+          index={index}
+          title={editedTitle ? editedTitle : title}
+          subtitle={editedSubtitle ? editedSubtitle : subtitle}
           onDelete={onDelete}
           revealed={revealed}
           editable={editMode}
-          onFinishEditing={onFinishEditing}
+          onEdited={onEdited}
         />
       </View>
     </View>
