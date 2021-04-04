@@ -1,79 +1,31 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
-  Animated,
   StyleSheet,
   View,
+  Dimensions,
+  Animated,
   PanResponder,
-  Text,
-  Pressable,
 } from 'react-native';
-import { Icon } from 'react-native-elements';
-import * as Haptics from 'expo-haptics';
 
 import Card from '../Card';
 import { confirmDistance } from '../../constants';
 
-const EmptyMessage = () => {
-  return (
-    <View
-      style={{
-        alignItems: 'center',
-      }}
-    >
-      <Icon size={32} type="feather" name="check" />
-      <Text style={styles.emptyMessageText}>You've learnt a lot!</Text>
-      <Text style={styles.emptyMessageSubtitle}>
-        You've gone through all your Yizis.
-      </Text>
-    </View>
-  );
-};
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const dismissTarget = SCREEN_HEIGHT + 100;
 
 const Pile = (props) => {
   const { cards } = props;
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [nextCard, setNextCard] = useState({ title: '', subtitle: '' });
-  const [revealed, setRevealed] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [empty, setEmpty] = useState(false);
-
   const pan = useRef(new Animated.ValueXY()).current;
-  const fadeAnim = useRef(new Animated.Value(1)).current;
-  const pressAnim = useRef(new Animated.Value(1)).current;
-  const cardColor = useRef(new Animated.Value(0)).current;
 
-  let prevD = 0;
-  const dismissTarget = 1000;
+  useEffect(() => restart(), [cards]);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => false,
-    onMoveShouldSetPanResponder: (e, gestureState) => {
-      return Math.abs(gestureState.dx) >= 1 || Math.abs(gestureState.dy) >= 1;
-    },
+    onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
-      const { dy } = gestureState;
-      const d = Math.abs(dy);
-
-      editMode && setEditMode(false);
-
-      if (d > confirmDistance && prevD < confirmDistance) {
-        Haptics.selectionAsync();
-        Animated.timing(cardColor, {
-          toValue: dy > 0 ? 100 : -100,
-          duration: 100,
-          useNativeDriver: false,
-        }).start();
-      } else if (d < confirmDistance && prevD > confirmDistance) {
-        Animated.timing(cardColor, {
-          toValue: 0,
-          duration: 100,
-          useNativeDriver: false,
-        }).start();
-      }
-
-      prevD = d;
-
       Animated.event([null, { dx: pan.x, dy: pan.y }], {
         useNativeDriver: false,
       })(e, gestureState);
@@ -83,235 +35,67 @@ const Pile = (props) => {
       const d = Math.abs(y);
 
       if (d < confirmDistance) {
-        Animated.spring(
-          pan,
-          { toValue: { x: 0, y: 0 }, useNativeDriver: true } // Back to zero
-        ).start();
+        Animated.spring(pan, {
+          toValue: { x: 0, y: 0 },
+          useNativeDriver: true,
+        }).start();
       } else {
         dismissCard(y < 0);
       }
     },
   });
 
-  const dismissCard = (up = true) => {
-    Animated.timing(pan, {
+  const cardRotation = pan.x.interpolate({
+    inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
+    outputRange: ['-10deg', '0deg', '10deg'],
+    extrapolate: 'clamp',
+  });
+
+  const dismissCard = (up = false) => {
+    Animated.spring(pan, {
       toValue: { x: 0, y: up ? -dismissTarget : dismissTarget },
-      duration: 150,
       useNativeDriver: true,
     }).start(() => {
       showNextCard();
     });
   };
 
-  const target = confirmDistance * 1;
-  const nextCardTranslateY = pan.y.interpolate({
-    inputRange: [-target - 1, -target, 0, target, target + 1],
-    outputRange: [0, 0, 10, 0, 0],
-  });
-  const nextCardTranslateX = pan.y.interpolate({
-    inputRange: [-target - 1, -target, 0, target, target + 1],
-    outputRange: [0, 0, 0, 0, 0],
-  });
-  const nextCardRotation = pan.y.interpolate({
-    inputRange: [-target - 1, -target, 0, target, target + 1],
-    outputRange: [0, 0, 0.03, 0, 0],
-  });
-  const thirdCardOpacity = pan.y.interpolate({
-    inputRange: [-target - 1, -target, 0, target, target + 1],
-    outputRange: [1, 1, 0, 1, 1],
-  });
-
-  const resetCard = () => {
-    pan.setValue({ x: 0, y: 0 });
-    cardColor.setValue(0);
-    setRevealed(false);
-    setEditMode(false);
-  };
-
-  const animatePrevious = (callback = () => {}) => {
-    pan.setValue({ x: 0, y: -dismissTarget });
-    Animated.spring(pan, {
-      toValue: { x: 0, y: 0 },
-      useNativeDriver: true,
-    }).start(callback);
-  };
-
-  const animateNext = (callback = () => {}) => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 400,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const showFirstCard = () => {
-    resetCard();
-
-    setCurrentIndex(0);
-    setNextCard(cards[currentIndex]);
-
-    animatePrevious(() => {
-      setNextCard(cards[1]);
-    });
-  };
-
-  const showPreviousCard = () => {
-    resetCard();
-
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      animatePrevious();
-    }
-  };
-
   const showNextCard = () => {
-    resetCard();
-
-    if (currentIndex < cards.length - 1) {
-      const i = currentIndex;
-      setCurrentIndex(i + 1);
-
-      animateNext();
-    } else {
-      setEmpty(true);
-    }
+    setCurrentIndex(currentIndex + 1);
   };
 
-  animateCardPressIn = () => {
-    Animated.spring(pressAnim, {
-      toValue: 1,
-      speed: 20,
-      useNativeDriver: true,
-    }).start();
+  const restart = () => {
+    setCurrentIndex(0);
+    pan.setValue({ x: 0, y: 0 });
   };
 
-  animateCardPressOut = () => {
-    Animated.spring(pressAnim, {
-      toValue: 0,
-      useNativeDriver: true,
-      bounciness: true ? 0 : 22,
-      speed: 100,
-    }).start();
+  const getTransformStyles = () => {
+    return [
+      { translateX: pan.x },
+      { translateY: pan.y },
+      { rotate: cardRotation },
+    ];
   };
 
-  const pressResponse = {
-    scale: pressAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0.98],
-    }),
-    translateY: pressAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 5],
-    }),
+  const renderCards = () => {
+    return cards
+      .map((card, i) => {
+        if (i < currentIndex || i > currentIndex + 1) return;
+        return (
+          <Animated.View
+            style={i === currentIndex && { transform: getTransformStyles() }}
+            key={i}
+          >
+            <Card title={card.title} subtitle={card.subtitle}></Card>
+          </Animated.View>
+        );
+      })
+      .reverse();
   };
-
-  useEffect(() => {
-    resetCard();
-    setEmpty(false);
-    showFirstCard();
-  }, [cards]);
-
-  useEffect(() => {
-    currentIndex !== 0 && setNextCard(cards[currentIndex + 1]);
-  }, [currentIndex]);
-
-  const card = cards[currentIndex] || { title: '', subtitle: '' };
 
   return (
     <View style={styles.container}>
-      <View style={{ opacity: empty ? 0 : 1 }}>
-        <Animated.View
-          style={{
-            transform: [
-              { translateX: pan.x },
-              { translateY: Animated.add(pan.y, pressResponse.translateY) },
-              { scale: pressResponse.scale },
-            ],
-            opacity: fadeAnim,
-          }}
-          {...panResponder.panHandlers}
-        >
-          <Pressable
-            onPressIn={animateCardPressIn}
-            onPressOut={animateCardPressOut}
-            onPress={() => {
-              Haptics.selectionAsync();
-              if (editMode) {
-                setEditMode(false);
-              } else {
-                setRevealed(true);
-              }
-            }}
-            onLongPress={() => {
-              animateCardPressOut();
-              Haptics.selectionAsync();
-              setEditMode(!editMode);
-            }}
-          >
-            <Card
-              title={card.title}
-              subtitle={card.subtitle}
-              color={cardColor}
-              revealed={revealed}
-              editMode={editMode}
-              onDelete={dismissCard}
-              onFinishEditing={() => setEditMode(false)}
-            ></Card>
-          </Pressable>
-        </Animated.View>
-        {currentIndex < cards.length - 1 && (
-          <View style={styles.nextCard}>
-            <Animated.View
-              style={{
-                transform: [
-                  { translateX: nextCardTranslateX },
-                  { translateY: nextCardTranslateY },
-                  { rotate: nextCardRotation },
-                ],
-              }}
-            >
-              <Card
-                title={nextCard.title}
-                subtitle={nextCard.subtitle}
-                color={new Animated.Value(0)}
-                revealed={false}
-              ></Card>
-            </Animated.View>
-          </View>
-        )}
-        {currentIndex < cards.length - 2 && (
-          <View style={styles.thirdCard}>
-            <Animated.View
-              style={{
-                transform: [
-                  { translateX: 0 },
-                  { translateY: 10 },
-                  { rotate: 0.03 },
-                ],
-                opacity: thirdCardOpacity,
-              }}
-            >
-              <Card
-                title={''}
-                subtitle={''}
-                color={new Animated.Value(0)}
-                revealed={false}
-              ></Card>
-            </Animated.View>
-          </View>
-        )}
-      </View>
-      <Animated.View
-        style={{
-          height: 500,
-          alignContent: 'center',
-          alignItems: 'center',
-          zIndex: -1,
-          justifyContent: 'center',
-        }}
-      >
-        <EmptyMessage></EmptyMessage>
-      </Animated.View>
+      <View {...panResponder.panHandlers}>{renderCards()}</View>
     </View>
   );
 };
@@ -323,54 +107,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 16,
   },
-  header: {
+  cardWrapper: {
     position: 'absolute',
-    top: 0,
-    padding: 20,
-    paddingLeft: 30,
-    paddingTop: 50,
-    width: '100%',
-  },
-  logo: {
-    fontFamily: 'American Typewriter',
-    fontSize: 28,
-    fontWeight: '500',
-    color: '#BBB',
-    textShadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    textShadowRadius: 0,
-  },
-  item: { flex: 2 },
-  controls: { flex: 1 },
-  komo: {
-    width: 200,
-    height: 200,
-    marginBottom: 10,
-  },
-  emptyMessageText: {
-    fontFamily: 'Avenir',
-    fontSize: 22,
-    fontWeight: '500',
-  },
-  newButton: {
-    position: 'absolute',
-    right: 10,
-    bottom: 50,
-  },
-  nextCard: {
-    flex: 1,
-    width: '100%',
-    position: 'absolute',
-    zIndex: -10,
-    padding: 0,
-  },
-  thirdCard: {
-    flex: 1,
-    width: '100%',
-    position: 'absolute',
-    zIndex: -11,
   },
 });
 

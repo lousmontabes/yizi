@@ -1,121 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, View, StyleSheet, Alert } from 'react-native';
+import {
+  Animated,
+  StyleSheet,
+  Alert,
+  TextInput,
+  Pressable,
+} from 'react-native';
 import { Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import ItemForm from '../ItemForm';
 import storage from '../../utils/storage';
 
-// TODO: Move this to constants
-const colors = {
-  green: 'rgba(116, 198, 157, 1)',
-  black: 'rgba(0, 0, 0, 1)',
-  red: 'rgba(217, 119, 119, 1)',
-};
-
-const EditView = (props) => {
-  const { title, subtitle, onDelete, onFinishEditing } = props;
-
-  const [newTitle, setNewTitle] = useState(title);
-  const [newSubtitle, setNewSubtitle] = useState(subtitle);
-
-  const AnimatedIcon = Animated.createAnimatedComponent(Icon);
-  const fadeInAnim = useRef(new Animated.Value(0)).current;
-
-  const showDeleteAlert = () => {
-    Alert.alert(
-      `${title} - ${subtitle}`,
-      'Are you sure you want to delete this item?',
-      [
-        { text: 'Cancel' },
-        {
-          text: 'Delete',
-          onPress: () => {
-            fadeInAnim.setValue(0);
-            storage.deleteItem({ title, subtitle });
-            onDelete();
-          },
-          style: 'destructive',
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
-  const onSubmit = () => {
-    storage.modifyItem(
-      { title, subtitle },
-      { title: newTitle, subtitle: newSubtitle }
-    );
-    onFinishEditing();
-  };
-
-  useEffect(() => {
-    Animated.timing(fadeInAnim, {
-      toValue: 1,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  return (
-    <>
-      <Animated.View style={{ ...styles.button, opacity: fadeInAnim }}>
-        <AnimatedIcon
-          size={28}
-          reverse
-          color="transparent"
-          reverseColor={colors.red}
-          type="feather"
-          name="trash-2"
-          onPress={() => {
-            Haptics.selectionAsync();
-            showDeleteAlert();
-          }}
-        />
-      </Animated.View>
-      <ItemForm
-        title={newTitle}
-        subtitle={newSubtitle}
-        onChangeTitle={setNewTitle}
-        onChangeSubtitle={setNewSubtitle}
-        onSubmit={onSubmit}
-      />
-    </>
-  );
-};
-
 const Card = (props) => {
-  const {
-    title,
-    subtitle,
-    color,
-    revealed,
-    editMode,
-    onDelete,
-    onFinishEditing,
-  } = props;
+  const { title, subtitle } = props;
+
+  const [revealed, setRevealed] = useState(false);
+  const [editing, setEditing] = useState(false);
+
   const revealAnim = useRef(new Animated.Value(0)).current;
-
-  const revealScale = revealAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.9, 1],
-  });
-
-  const textColor = color.interpolate({
-    inputRange: [-100, 0, 100],
-    outputRange: [colors.red, colors.black, colors.green],
-  });
-
-  const titleStyle = {
-    ...StyleSheet.flatten(styles.title),
-    color: textColor,
-  };
-
-  const descriptionStyle = {
-    ...StyleSheet.flatten(styles.description),
-    color: textColor,
-  };
+  const pressAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (revealed) {
@@ -128,40 +32,75 @@ const Card = (props) => {
     } else {
       revealAnim.setValue(0);
     }
-  }, [revealed, editMode]);
+  }, [revealed]);
+
+  const animateCardPressIn = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      speed: 20,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const animateCardPressOut = () => {
+    Animated.spring(pressAnim, {
+      toValue: 0,
+      useNativeDriver: true,
+      bounciness: true ? 0 : 22,
+      speed: 100,
+    }).start();
+  };
+
+  const pressResponse = {
+    scale: pressAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0.98],
+    }),
+    translateY: pressAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 5],
+    }),
+  };
+
+  const reveal = () => {
+    Haptics.selectionAsync();
+    setRevealed(!revealed);
+  };
+
+  const toggleEditMode = () => {
+    Haptics.impactAsync();
+    setEditing(!editing);
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        {editMode && (
-          <EditView
-            title={title}
-            subtitle={subtitle}
-            onDelete={onDelete}
-            revealed={revealed}
-            onFinishEditing={onFinishEditing}
-          />
-        )}
-        {!editMode && (
-          <>
-            <Animated.Text style={titleStyle}>{title}</Animated.Text>
-            <Animated.View
-              style={{
-                opacity: revealAnim,
-                transform: [{ scale: revealScale }],
-              }}
-            >
-              <Animated.Text style={descriptionStyle}>{subtitle}</Animated.Text>
-            </Animated.View>
-          </>
-        )}
-      </View>
-    </View>
+    <Pressable
+      onPressIn={animateCardPressIn}
+      onPressOut={animateCardPressOut}
+      onPress={reveal}
+      style={styles.wrapper}
+    >
+      <Animated.View
+        style={[styles.card, { transform: [{ scale: pressResponse.scale }] }]}
+      >
+        <TextInput style={styles.title} editable={editing}>
+          {title}
+        </TextInput>
+        <Animated.View
+          style={{
+            opacity: revealAnim,
+          }}
+        >
+          <TextInput style={styles.description} editable={editing}>
+            {subtitle}
+          </TextInput>
+        </Animated.View>
+      </Animated.View>
+    </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
     backgroundColor: '#FFF',
     fontFamily: 'Menlo',
@@ -193,24 +132,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 28,
     fontFamily: 'Avenir',
-  },
-  titleInput: {
-    textAlign: 'center',
-    fontSize: 42,
-    fontFamily: 'Avenir',
-    fontWeight: '500',
-    marginHorizontal: 15,
-  },
-  subtitleInput: {
-    textAlign: 'center',
-    fontSize: 28,
-    fontFamily: 'Avenir',
-    marginHorizontal: 15,
-  },
-  button: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
   },
 });
 
