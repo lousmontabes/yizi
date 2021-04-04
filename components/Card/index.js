@@ -1,22 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Animated,
-  StyleSheet,
-  Alert,
-  TextInput,
-  Pressable,
-} from 'react-native';
-import { Icon } from 'react-native-elements';
+import { Animated, StyleSheet, Text, Pressable } from 'react-native';
 import * as Haptics from 'expo-haptics';
-
-import ItemForm from '../ItemForm';
-import storage from '../../utils/storage';
 
 const Card = (props) => {
   const { title, subtitle } = props;
 
   const [revealed, setRevealed] = useState(false);
-  const [editing, setEditing] = useState(false);
 
   const revealAnim = useRef(new Animated.Value(0)).current;
   const pressAnim = useRef(new Animated.Value(0)).current;
@@ -67,11 +56,6 @@ const Card = (props) => {
     setRevealed(!revealed);
   };
 
-  const toggleEditMode = () => {
-    Haptics.impactAsync();
-    setEditing(!editing);
-  };
-
   return (
     <Pressable
       onPressIn={animateCardPressIn}
@@ -82,17 +66,13 @@ const Card = (props) => {
       <Animated.View
         style={[styles.card, { transform: [{ scale: pressResponse.scale }] }]}
       >
-        <TextInput style={styles.title} editable={editing}>
-          {title}
-        </TextInput>
+        <Text style={styles.title}>{title}</Text>
         <Animated.View
           style={{
             opacity: revealAnim,
           }}
         >
-          <TextInput style={styles.description} editable={editing}>
-            {subtitle}
-          </TextInput>
+          <Text style={styles.description}>{subtitle}</Text>
         </Animated.View>
       </Animated.View>
     </Pressable>
