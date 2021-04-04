@@ -80,7 +80,7 @@ const Main = (props) => {
         pagingEnabled={true}
         showsHorizontalScrollIndicator={false}
         scrollEnabled={!movingPile}
-        disableScrollViewPanResponder={true}
+        contentOffset={{ x: deviceWidth }}
       >
         <SafeAreaView style={styles.panel}>
           <Header
