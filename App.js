@@ -19,10 +19,4 @@ const App = () => {
   return <Main cards={cards} refresh={loadItems}></Main>;
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
 export default App;

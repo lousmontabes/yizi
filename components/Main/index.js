@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
-  Animated,
   StyleSheet,
   View,
   Text,
