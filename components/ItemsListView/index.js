@@ -1,44 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Animated,
+  Easing,
   View,
   StyleSheet,
   Text,
   FlatList,
-  TextInput,
+  Dimensions,
 } from 'react-native';
-import { Icon } from 'react-native-elements';
+import { SafeAreaView } from 'react-navigation';
+import { Header, Icon } from 'react-native-elements';
+import * as Haptics from 'expo-haptics';
 
-const SearchBar = (props) => {
-  const { onSearch } = props;
-  const [query, setQuery] = useState('');
+import SearchBar from './SearchBar';
 
-  const onEnterQuery = (query) => {
-    setQuery(query);
-    handleSearch(query);
-  };
-
-  const handleSearch = (query) => {
-    onSearch(query);
-  };
-
-  return (
-    <View style={styles.searchBarWrapper}>
-      <View style={styles.searchBarIcon}>
-        <Icon size={20} type="feather" name="search" />
-      </View>
-      <TextInput
-        style={styles.searchBarInput}
-        placeholder="Search"
-        clearButtonMode="always"
-        autoCorrect={false}
-        value={query}
-        onChangeText={onEnterQuery}
-        selectionColor={'#000'}
-      ></TextInput>
-    </View>
-  );
-};
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const Item = (props) => {
   const { card } = props;
@@ -55,6 +32,24 @@ const ItemsListView = (props) => {
   const { cards } = props;
   const [data, setData] = useState(cards);
 
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = fadeAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [50, 0],
+    extrapolate: 'clamp',
+  });
+
+  useEffect(() => {
+    Animated.spring(fadeAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  useEffect(() => {
+    setData(cards);
+  }, [cards]);
+
   const filterCards = (query) => {
     const result =
       query.length > 0
@@ -67,25 +62,91 @@ const ItemsListView = (props) => {
     setData(result);
   };
 
+  const hideView = () => {
+    const { hide } = props;
+    Haptics.impactAsync();
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start(() => hide());
+  };
+
   const renderItem = ({ item }) => {
     return <Item card={item} />;
   };
 
   return (
-    <View style={styles.container}>
-      <SearchBar onSearch={filterCards} />
-      <FlatList
-        style={styles.list}
-        data={data}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.title}
-      />
-    </View>
+    <Animated.View
+      style={[
+        styles.container,
+        { opacity: fadeAnim, transform: [{ translateY: scaleAnim }] },
+      ]}
+    >
+      <SafeAreaView style={styles.panel}>
+        <Header
+          barStyle="dark-content"
+          placement="left"
+          centerComponent={{ text: 'Your yizis', style: styles.header }}
+          containerStyle={{
+            backgroundColor: '#FFF',
+            justifyContent: 'space-around',
+            borderBottomWidth: 0,
+            paddingVertical: 20,
+          }}
+        />
+        <View style={styles.inner}>
+          <SearchBar onSearch={filterCards} />
+          <FlatList
+            style={styles.list}
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.title}
+          />
+        </View>
+        <View style={styles.icons}>
+          <Icon
+            size={28}
+            reverse
+            color="transparent"
+            reverseColor="black"
+            type="feather"
+            name="x"
+            onPress={hideView}
+          />
+          <Icon reverse raised size={28} type="feather" name="edit-2" />
+        </View>
+      </SafeAreaView>
+    </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { display: 'flex', height: '100%' },
+  header: {
+    fontFamily: 'Avenir',
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#000',
+    paddingTop: 18,
+    textShadowOffset: {
+      width: 1,
+      height: 2,
+    },
+    textShadowRadius: 0,
+    marginHorizontal: 8,
+  },
+  container: {
+    height: SCREEN_HEIGHT,
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    zIndex: 34,
+  },
+  inner: {
+    backgroundColor: '#FFF',
+    flex: 1,
+  },
+  panel: { height: SCREEN_HEIGHT, width: SCREEN_WIDTH, zIndex: 100 },
   item: { marginHorizontal: 35, marginVertical: 10 },
   title: {
     fontSize: 28,
@@ -96,18 +157,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'Avenir',
   },
-  searchBarWrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 20,
-    marginBottom: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    backgroundColor: 'rgb(240, 240, 240)',
-    borderRadius: 6,
-  },
-  searchBarInput: { fontSize: 22, marginLeft: 10, flex: 1 },
+  icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
 });
 
 export default ItemsListView;

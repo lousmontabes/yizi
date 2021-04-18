@@ -1,13 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ScrollView,
-  Dimensions,
-  SafeAreaView,
-} from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
@@ -16,7 +9,6 @@ import CreateView from '../../components/CreateView';
 import ItemsListView from '../../components/ItemsListView';
 
 const deviceWidth = Dimensions.get('window').width;
-const deviceHeight = Dimensions.get('window').height;
 
 const EmptyState = () => {
   return (
@@ -41,11 +33,9 @@ const EmptyState = () => {
 };
 
 const Main = (props) => {
-  const [createViewVisible, setCreateViewVisible] = useState(false);
-  const [movingPile, setMovingPile] = useState(false);
   const { cards, refresh } = props;
-
-  const scrollView = useRef();
+  const [createViewVisible, setCreateViewVisible] = useState(false);
+  const [listViewVisible, setListViewVisible] = useState(false);
 
   const onRefreshPressed = () => {
     Haptics.impactAsync();
@@ -62,61 +52,32 @@ const Main = (props) => {
     setCreateViewVisible(false);
   };
 
-  const onStartMovingPile = () => {
-    setMovingPile(true);
-    //scrollView.current.scrollToEnd();
+  const showListView = () => {
+    Haptics.impactAsync();
+    setListViewVisible(true);
   };
 
-  const onEndMovingPile = () => {
-    setMovingPile(false);
+  const hideListView = () => {
+    setListViewVisible(false);
   };
 
   return (
     <>
-      <ScrollView
-        ref={scrollView}
-        horizontal={true}
-        pagingEnabled={true}
-        showsHorizontalScrollIndicator={false}
-        scrollEnabled={!movingPile}
-        contentOffset={{ x: deviceWidth }}
-      >
-        <SafeAreaView style={styles.panel}>
-          <Header
-            barStyle="dark-content"
-            placement="left"
-            centerComponent={{ text: 'Your yizis', style: styles.logo2 }}
-            containerStyle={{
-              backgroundColor: '#FFF',
-              justifyContent: 'space-around',
-              borderBottomWidth: 0,
-              paddingVertical: 20,
-            }}
-          />
-          <ItemsListView cards={cards} />
-        </SafeAreaView>
-        <SafeAreaView style={styles.panel}>
-          <Header
-            barStyle="dark-content"
-            placement="center"
-            centerComponent={{ text: 'yizi', style: styles.logo }}
-            containerStyle={{
-              backgroundColor: '#FFF',
-              justifyContent: 'space-around',
-              borderBottomWidth: 0,
-              paddingVertical: 20,
-            }}
-          />
-          {!!cards.length && (
-            <Pile
-              cards={cards}
-              onStartMove={onStartMovingPile}
-              onEndMove={onEndMovingPile}
-            ></Pile>
-          )}
-          {!cards.length && <EmptyState></EmptyState>}
-        </SafeAreaView>
-      </ScrollView>
+      <Header
+        barStyle="dark-content"
+        placement="center"
+        centerComponent={{ text: 'yizi', style: styles.logo }}
+        containerStyle={{
+          backgroundColor: '#FFF',
+          justifyContent: 'space-around',
+          borderBottomWidth: 0,
+          paddingVertical: 20,
+        }}
+      />
+      {!!cards.length && <Pile cards={cards}></Pile>}
+      {!cards.length && <EmptyState></EmptyState>}
+      {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
+      {listViewVisible && <ItemsListView cards={cards} hide={hideListView} />}
       <View style={styles.icons}>
         <Icon
           size={28}
@@ -124,8 +85,8 @@ const Main = (props) => {
           color="transparent"
           reverseColor="black"
           type="feather"
-          name="refresh-ccw"
-          onPress={onRefreshPressed}
+          name="list"
+          onPress={showListView}
         />
         <Icon
           reverse
@@ -136,7 +97,6 @@ const Main = (props) => {
           onPress={showCreateView}
         />
       </View>
-      {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
       <StatusBar barStyle="default" />
     </>
   );
@@ -165,18 +125,7 @@ const styles = StyleSheet.create({
       height: 2,
     },
     textShadowRadius: 0,
-  },
-  logo2: {
-    fontFamily: 'Avenir',
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#000',
-    textShadowOffset: {
-      width: 1,
-      height: 2,
-    },
-    textShadowRadius: 0,
-    marginHorizontal: 8,
+    marginTop: 20,
   },
   item: { flex: 2 },
   controls: { flex: 1 },
