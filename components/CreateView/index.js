@@ -105,7 +105,7 @@ const CreateView = (props) => {
   };
 
   return (
-    <Animated.View style={{ ...styles.container, opacity: fadeAnim }}>
+    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
