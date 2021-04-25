@@ -11,7 +11,6 @@ import Card from '../Card';
 import { confirmDistance } from '../../constants';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const dismissTarget = SCREEN_HEIGHT + 100;
 
 const Pile = (props) => {

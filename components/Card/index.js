@@ -66,7 +66,6 @@ const Card = (props) => {
       <Animated.View
         style={[styles.card, { transform: [{ scale: pressResponse.scale }] }]}
       >
-        <Text style={styles.phonetic}>zhōng wén</Text>
         <Text style={styles.title}>{title}</Text>
         <Animated.View
           style={{
@@ -113,12 +112,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 28,
     fontFamily: 'Avenir',
-  },
-  phonetic: {
-    textAlign: 'center',
-    fontFamily: 'Avenir',
-    fontWeight: '600',
-    fontSize: 22,
   },
 });
 
