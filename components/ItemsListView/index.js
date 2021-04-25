@@ -98,7 +98,7 @@ const ItemsListView = (props) => {
         <View style={styles.inner}>
           <SearchBar onSearch={filterCards} />
           <FlatList
-            style={styles.list}
+            contentContainerStyle={styles.list}
             data={data}
             renderItem={renderItem}
             keyExtractor={(item) => item.title}
@@ -158,6 +158,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Avenir',
   },
   icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
+  list: { paddingBottom: 50 },
 });
 
 export default ItemsListView;
