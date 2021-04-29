@@ -13,6 +13,7 @@ import * as Haptics from 'expo-haptics';
 import Pile from '../../components/Pile';
 import CreateView from '../../components/CreateView';
 import ItemsListView from '../../components/ItemsListView';
+import theme from '../../constants/themes';
 
 const deviceWidth = Dimensions.get('window').width;
 
@@ -95,15 +96,10 @@ const Main = (props) => {
   return (
     <>
       <Header
-        barStyle="dark-content"
+        barStyle={theme.dark ? 'light-content' : 'dark-content'}
         placement="center"
         centerComponent={{ text: 'yizi', style: styles.logo }}
-        containerStyle={{
-          backgroundColor: '#FFF',
-          justifyContent: 'space-around',
-          borderBottomWidth: 0,
-          paddingVertical: 20,
-        }}
+        containerStyle={styles.header}
       />
       {!!cards.length && <Pile cards={cards}></Pile>}
       {!cards.length && <EmptyState></EmptyState>}
@@ -134,7 +130,7 @@ const Main = (props) => {
             size={28}
             reverse
             color="transparent"
-            reverseColor="black"
+            reverseColor={theme.accent}
             type="feather"
             name={button1.icon}
             onPress={() => {
@@ -150,6 +146,7 @@ const Main = (props) => {
             size={28}
             type="feather"
             name={button2.icon}
+            color={theme.accent}
             onPress={() => {
               Haptics.impactAsync();
               button2.onPress();
@@ -163,18 +160,16 @@ const Main = (props) => {
 
 const styles = StyleSheet.create({
   header: {
-    position: 'absolute',
-    top: 0,
-    padding: 20,
-    paddingLeft: 30,
-    paddingTop: 50,
-    width: '100%',
+    backgroundColor: theme.background,
+    justifyContent: 'space-around',
+    borderBottomWidth: 0,
+    paddingVertical: 20,
   },
   logo: {
     fontFamily: 'American Typewriter',
     fontSize: 28,
     fontWeight: '500',
-    color: '#BBB',
+    color: theme.logo,
     textShadowOffset: {
       width: 1,
       height: 2,

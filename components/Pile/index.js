@@ -9,6 +9,7 @@ import {
 
 import Card from '../Card';
 import { confirmDistance } from '../../constants';
+import theme from '../../constants/themes';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const dismissTarget = SCREEN_HEIGHT + 100;
@@ -136,6 +137,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
     marginVertical: 0,
     paddingHorizontal: 16,
+    backgroundColor: theme.background,
   },
   cardWrapper: {
     position: 'absolute',

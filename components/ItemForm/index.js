@@ -2,6 +2,8 @@ import React, { useRef } from 'react';
 import { StyleSheet, TextInput, Animated } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
+import theme from '../../constants/themes';
+
 const ItemForm = (props) => {
   const { onChangeTitle, onChangeSubtitle, onSubmit, title, subtitle } = props;
 
@@ -79,8 +81,8 @@ const ItemForm = (props) => {
           }}
           onSubmitEditing={onSubmitTitle}
           placeholder="New yizi"
-          placeholderTextColor="#999"
-          selectionColor={'#000'}
+          placeholderTextColor={theme.text}
+          selectionColor={theme.selection}
           style={styles.titleInput}
           returnKeyType="next"
           spellCheck={false}
@@ -101,8 +103,8 @@ const ItemForm = (props) => {
           }}
           onSubmitEditing={submit}
           placeholder="Its deep meaning"
-          placeholderTextColor="#999"
-          selectionColor={'#000'}
+          placeholderTextColor={theme.text}
+          selectionColor={theme.selection}
           style={styles.subtitleInput}
           enablesReturnKeyAutomatically
           returnKeyType="done"
@@ -120,12 +122,15 @@ const styles = StyleSheet.create({
     fontFamily: 'Avenir',
     fontWeight: '500',
     marginHorizontal: 15,
+    color: theme.text,
   },
   subtitleInput: {
     textAlign: 'center',
     fontSize: 28,
     fontFamily: 'Avenir',
     marginHorizontal: 15,
+    color: theme.text,
+    opacity: 0.8,
   },
 });
 

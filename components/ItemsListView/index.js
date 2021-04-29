@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-navigation';
 import { Header } from 'react-native-elements';
 
 import SearchBar from './SearchBar';
+import theme from '../../constants/themes';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -97,15 +98,10 @@ const ItemsListView = (props) => {
     >
       <SafeAreaView style={styles.panel}>
         <Header
-          barStyle="dark-content"
+          barStyle={theme.dark ? 'light-content' : 'dark-content'}
           placement="left"
-          centerComponent={{ text: 'Your yizis', style: styles.header }}
-          containerStyle={{
-            backgroundColor: '#FFF',
-            justifyContent: 'space-around',
-            borderBottomWidth: 0,
-            paddingVertical: 20,
-          }}
+          centerComponent={{ text: 'Your yizis', style: styles.headerContent }}
+          containerStyle={styles.header}
         />
         <View style={styles.inner}>
           <SearchBar onSearch={filterCards} />
@@ -123,10 +119,16 @@ const ItemsListView = (props) => {
 
 const styles = StyleSheet.create({
   header: {
+    justifyContent: 'space-around',
+    borderBottomWidth: 0,
+    paddingVertical: 20,
+    backgroundColor: theme.cards,
+  },
+  headerContent: {
     fontFamily: 'Avenir',
     fontSize: 28,
     fontWeight: '700',
-    color: '#000',
+    color: theme.cardText,
     paddingTop: 18,
     textShadowOffset: {
       width: 1,
@@ -143,19 +145,26 @@ const styles = StyleSheet.create({
     zIndex: 34,
   },
   inner: {
-    backgroundColor: '#FFF',
     flex: 1,
   },
-  panel: { height: SCREEN_HEIGHT, width: SCREEN_WIDTH, zIndex: 100 },
+  panel: {
+    height: SCREEN_HEIGHT,
+    width: SCREEN_WIDTH,
+    zIndex: 100,
+    backgroundColor: theme.cards,
+  },
   item: { marginHorizontal: 35, marginVertical: 10 },
   title: {
     fontSize: 28,
     fontFamily: 'Avenir',
     fontWeight: '500',
+    color: theme.cardText,
   },
   subtitle: {
     fontSize: 22,
     fontFamily: 'Avenir',
+    color: theme.cardText,
+    opacity: 0.8,
   },
   icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
   list: { paddingBottom: 50 },

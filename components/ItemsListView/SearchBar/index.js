@@ -3,6 +3,8 @@ import { Animated, View, TextInput, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
+import theme from '../../../constants/themes';
+
 const SearchBar = (props) => {
   const { onSearch } = props;
   const [query, setQuery] = useState('');
@@ -57,7 +59,12 @@ const SearchBar = (props) => {
       ]}
     >
       <View style={styles.searchBarIcon}>
-        <Icon size={20} type="feather" name="search" />
+        <Icon
+          size={20}
+          type="feather"
+          name="search"
+          color={theme.placeholder}
+        />
       </View>
       <TextInput
         style={styles.searchBarInput}
@@ -66,7 +73,8 @@ const SearchBar = (props) => {
         autoCorrect={false}
         value={query}
         onChangeText={onEnterQuery}
-        selectionColor={'#000'}
+        selectionColor={theme.selection}
+        placeholderTextColor={theme.placeholder}
         onFocus={onFocus}
         onBlur={onBlur}
       ></TextInput>
@@ -83,7 +91,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 15,
     paddingVertical: 10,
-    backgroundColor: 'rgb(240, 240, 240)',
     shadowOffset: {
       width: 0,
       height: 5,
@@ -91,8 +98,16 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
     borderWidth: 1,
     borderRadius: 6,
+    backgroundColor: theme.foreground,
+    color: theme.text,
   },
-  searchBarInput: { fontSize: 22, marginLeft: 10, flex: 1 },
+  searchBarInput: {
+    fontSize: 22,
+    marginLeft: 10,
+    flex: 1,
+    backgroundColor: theme.foreground,
+    color: theme.text,
+  },
 });
 
 export default SearchBar;

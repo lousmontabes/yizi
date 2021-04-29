@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, Pressable } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
+import theme from '../../constants/themes';
+
 const Card = (props) => {
   const { title, subtitle } = props;
 
@@ -85,7 +87,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Menlo',
   },
   card: {
-    backgroundColor: '#FFF',
+    backgroundColor: theme.cards,
     height: 500,
     shadowColor: '#000',
     shadowOffset: {
@@ -106,11 +108,14 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontFamily: 'Avenir',
     fontWeight: '500',
+    color: theme.cardText,
   },
   description: {
     textAlign: 'center',
     fontSize: 28,
     fontFamily: 'Avenir',
+    color: theme.cardText,
+    opacity: 0.8,
   },
 });
 

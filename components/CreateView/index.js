@@ -9,6 +9,7 @@ import {
 import * as Haptics from 'expo-haptics';
 
 import { confirmDistance } from '../../constants';
+import theme from '../../constants/themes';
 import storage from '../../utils/storage';
 
 import ItemForm from '../ItemForm';
@@ -140,32 +141,6 @@ const CreateView = (props) => {
               subtitle={subtitle}
             />
           </Animated.View>
-          {/*  <View style={styles.icons}>
-            <Icon
-              containerStyle={styles.newButton}
-              size={28}
-              reverse
-              color="white"
-              reverseColor="black"
-              type="feather"
-              name="x"
-              onPress={() => {
-                Haptics.impactAsync();
-                hideView(true);
-              }}
-            />
-            <Icon
-              containerStyle={styles.newButton}
-              reverse
-              raised
-              size={28}
-              type="feather"
-              name="check"
-              onPress={() => {
-                submitItem();
-              }}
-            />
-          </View> */}
         </Animated.View>
       </KeyboardAvoidingView>
     </Animated.View>
@@ -176,14 +151,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     zIndex: 34,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.background,
     height: '100%',
     width: '100%',
     position: 'absolute',
   },
   inner: {
     height: 500,
-    backgroundColor: '#FFF',
+    backgroundColor: theme.background,
     shadowColor: '#000',
     flex: 1,
     justifyContent: 'center',
