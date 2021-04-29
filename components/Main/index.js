@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Animated, StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Dimensions } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import Pile from '../../components/Pile';
 import CreateView from '../../components/CreateView';
+import ItemsListView from '../../components/ItemsListView';
+
+const deviceWidth = Dimensions.get('window').width;
 
 const EmptyState = () => {
   return (
@@ -30,8 +33,9 @@ const EmptyState = () => {
 };
 
 const Main = (props) => {
-  const [createViewVisible, setCreateViewVisible] = useState(false);
   const { cards, refresh } = props;
+  const [createViewVisible, setCreateViewVisible] = useState(false);
+  const [listViewVisible, setListViewVisible] = useState(false);
 
   const onRefreshPressed = () => {
     Haptics.impactAsync();
@@ -48,10 +52,19 @@ const Main = (props) => {
     setCreateViewVisible(false);
   };
 
+  const showListView = () => {
+    Haptics.impactAsync();
+    setListViewVisible(true);
+  };
+
+  const hideListView = () => {
+    setListViewVisible(false);
+  };
+
   return (
     <>
       <Header
-        barStyle="light-content"
+        barStyle="dark-content"
         placement="center"
         centerComponent={{ text: 'yizi', style: styles.logo }}
         containerStyle={{
@@ -63,6 +76,8 @@ const Main = (props) => {
       />
       {!!cards.length && <Pile cards={cards}></Pile>}
       {!cards.length && <EmptyState></EmptyState>}
+      {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
+      {listViewVisible && <ItemsListView cards={cards} hide={hideListView} />}
       <View style={styles.icons}>
         <Icon
           size={28}
@@ -70,8 +85,8 @@ const Main = (props) => {
           color="transparent"
           reverseColor="black"
           type="feather"
-          name="refresh-ccw"
-          onPress={onRefreshPressed}
+          name="list"
+          onPress={showListView}
         />
         <Icon
           reverse
@@ -82,7 +97,6 @@ const Main = (props) => {
           onPress={showCreateView}
         />
       </View>
-      {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
       <StatusBar barStyle="default" />
     </>
   );
@@ -111,6 +125,7 @@ const styles = StyleSheet.create({
       height: 2,
     },
     textShadowRadius: 0,
+    marginTop: 20,
   },
   item: { flex: 2 },
   controls: { flex: 1 },
@@ -126,6 +141,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
+  panel: { width: deviceWidth },
 });
 
 export default Main;

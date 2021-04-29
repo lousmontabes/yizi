@@ -22,7 +22,7 @@ const Pile = (props) => {
   useEffect(() => restart(), [cards]);
 
   const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => false,
+    onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
       Animated.event([null, { dx: pan.x, dy: pan.y }], {

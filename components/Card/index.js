@@ -35,7 +35,6 @@ const Card = (props) => {
     Animated.spring(pressAnim, {
       toValue: 0,
       useNativeDriver: true,
-      bounciness: true ? 0 : 22,
       speed: 100,
     }).start();
   };
