@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet } from 'react-native';
 import Main from './components/Main';
 import storage from './utils/storage';
 

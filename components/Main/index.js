@@ -1,6 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, Text, Dimensions } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Dimensions,
+  KeyboardAvoidingView,
+} from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
@@ -36,10 +42,35 @@ const Main = (props) => {
   const { cards, refresh } = props;
   const [createViewVisible, setCreateViewVisible] = useState(false);
   const [listViewVisible, setListViewVisible] = useState(false);
+  const [button1, setButton1] = useState({
+    show: true,
+    icon: 'list',
+    onPress: () => showListView(),
+  });
+  const [button2, setButton2] = useState({
+    show: true,
+    reverse: true,
+    icon: 'edit-2',
+    onPress: () => showCreateView(),
+  });
 
   const onRefreshPressed = () => {
     Haptics.impactAsync();
     refresh();
+  };
+
+  const onHideOthers = () => {
+    setButton1({
+      show: true,
+      icon: 'list',
+      onPress: () => showListView(),
+    });
+    setButton2({
+      show: true,
+      reverse: true,
+      icon: 'edit-2',
+      onPress: () => showCreateView(),
+    });
   };
 
   const showCreateView = () => {
@@ -76,37 +107,61 @@ const Main = (props) => {
       />
       {!!cards.length && <Pile cards={cards}></Pile>}
       {!cards.length && <EmptyState></EmptyState>}
-      {createViewVisible && <CreateView hide={hideCreateView}></CreateView>}
-      {listViewVisible && <ItemsListView cards={cards} hide={hideListView} />}
-      <View style={styles.icons}>
-        <Icon
-          size={28}
-          reverse
-          color="transparent"
-          reverseColor="black"
-          type="feather"
-          name="list"
-          onPress={showListView}
+      {createViewVisible && (
+        <CreateView
+          hide={hideCreateView}
+          setButton1={setButton1}
+          setButton2={setButton2}
+          onHideOthers={onHideOthers}
+        ></CreateView>
+      )}
+      {listViewVisible && (
+        <ItemsListView
+          cards={cards}
+          hide={hideListView}
+          setButton1={setButton1}
+          setButton2={setButton2}
+          onHideOthers={onHideOthers}
         />
-        <Icon
-          reverse
-          raised
-          size={28}
-          type="feather"
-          name="edit-2"
-          onPress={showCreateView}
-        />
-      </View>
+      )}
       <StatusBar barStyle="default" />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.icons}
+      >
+        {button1.show && (
+          <Icon
+            size={28}
+            reverse
+            color="transparent"
+            reverseColor="black"
+            type="feather"
+            name={button1.icon}
+            onPress={() => {
+              Haptics.impactAsync();
+              button1.onPress();
+            }}
+          />
+        )}
+        {button2.show && (
+          <Icon
+            reverse={button2.reverse}
+            raised
+            size={28}
+            type="feather"
+            name={button2.icon}
+            onPress={() => {
+              Haptics.impactAsync();
+              button2.onPress();
+            }}
+          />
+        )}
+      </KeyboardAvoidingView>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    zIndex: 1,
-  },
   header: {
     position: 'absolute',
     top: 0,
@@ -140,7 +195,13 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '500',
   },
-  icons: { position: 'absolute', right: 10, bottom: 50, zIndex: 10 },
+  icons: {
+    position: 'absolute',
+    right: 10,
+    bottom: 0,
+    zIndex: 10000,
+    marginBottom: 50,
+  },
   panel: { width: deviceWidth },
 });
 

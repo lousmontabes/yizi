@@ -6,7 +6,6 @@ import {
   PanResponder,
   View,
 } from 'react-native';
-import { Icon } from 'react-native-elements';
 import * as Haptics from 'expo-haptics';
 
 import { confirmDistance } from '../../constants';
@@ -33,10 +32,7 @@ const CreateView = (props) => {
     onPanResponderRelease: () => {
       const d = pan._value;
       if (d < confirmDistance) {
-        Animated.spring(
-          pan, // Auto-multiplexed
-          { toValue: 0, useNativeDriver: true }
-        ).start();
+        Animated.spring(pan, { toValue: 0, useNativeDriver: true }).start();
       } else {
         hideView(true);
       }
@@ -44,6 +40,18 @@ const CreateView = (props) => {
   });
 
   useEffect(() => {
+    const { setButton1, setButton2 } = props;
+    setButton1({
+      show: true,
+      icon: 'x',
+      onPress: () => hideView(),
+    });
+    setButton2({
+      show: true,
+      reverse: true,
+      icon: 'check',
+      onPress: () => submitItem(),
+    });
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 200,
@@ -52,6 +60,7 @@ const CreateView = (props) => {
   }, [fadeAnim]);
 
   const hideView = (itemAdded) => {
+    const { onHideOthers } = props;
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 0,
@@ -64,6 +73,7 @@ const CreateView = (props) => {
         useNativeDriver: true,
       }),
     ]).start(() => {
+      onHideOthers();
       props.hide(itemAdded);
     });
   };
@@ -84,7 +94,6 @@ const CreateView = (props) => {
       useNativeDriver: true,
     }).start(() => {
       resetInputs();
-      //titleInputRef.current.focus();
       nextAnim.setValue(1);
       nextOpacity.setValue(0);
       Animated.timing(nextOpacity, {
@@ -131,7 +140,7 @@ const CreateView = (props) => {
               subtitle={subtitle}
             />
           </Animated.View>
-          <View style={styles.icons}>
+          {/*  <View style={styles.icons}>
             <Icon
               containerStyle={styles.newButton}
               size={28}
@@ -156,7 +165,7 @@ const CreateView = (props) => {
                 submitItem();
               }}
             />
-          </View>
+          </View> */}
         </Animated.View>
       </KeyboardAvoidingView>
     </Animated.View>

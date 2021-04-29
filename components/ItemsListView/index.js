@@ -9,8 +9,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
-import { Header, Icon } from 'react-native-elements';
-import * as Haptics from 'expo-haptics';
+import { Header } from 'react-native-elements';
 
 import SearchBar from './SearchBar';
 
@@ -40,6 +39,17 @@ const ItemsListView = (props) => {
   });
 
   useEffect(() => {
+    const { setButton1, setButton2 } = props;
+    setButton1({
+      show: true,
+      icon: 'x',
+      onPress: () => hideView(),
+    });
+    setButton2({
+      show: false,
+      icon: 'x',
+      onPress: () => {},
+    });
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 300,
@@ -65,8 +75,8 @@ const ItemsListView = (props) => {
   };
 
   const hideView = () => {
-    const { hide } = props;
-    Haptics.impactAsync();
+    const { hide, onHideOthers } = props;
+    onHideOthers();
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 150,
@@ -103,20 +113,8 @@ const ItemsListView = (props) => {
             contentContainerStyle={styles.list}
             data={data}
             renderItem={renderItem}
-            keyExtractor={(item) => item.title}
+            keyExtractor={(item, index) => `${index}-${item.title}`}
           />
-        </View>
-        <View style={styles.icons}>
-          <Icon
-            size={28}
-            reverse
-            color="transparent"
-            reverseColor="black"
-            type="feather"
-            name="x"
-            onPress={hideView}
-          />
-          <Icon reverse raised size={28} type="feather" name="edit-2" />
         </View>
       </SafeAreaView>
     </Animated.View>

@@ -134,8 +134,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     zIndex: 1,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    marginVertical: 0,
+    paddingHorizontal: 16,
   },
   cardWrapper: {
     position: 'absolute',

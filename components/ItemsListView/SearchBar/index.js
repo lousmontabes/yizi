@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Animated, View, TextInput, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
+import * as Haptics from 'expo-haptics';
 
 const SearchBar = (props) => {
   const { onSearch } = props;
@@ -26,6 +27,7 @@ const SearchBar = (props) => {
   };
 
   const onFocus = () => {
+    Haptics.impactAsync();
     Animated.spring(pressAnim, {
       toValue: 1,
       speed: 20,
@@ -34,6 +36,7 @@ const SearchBar = (props) => {
   };
 
   const onBlur = () => {
+    Haptics.impactAsync();
     Animated.spring(pressAnim, {
       toValue: 0,
       speed: 20,
