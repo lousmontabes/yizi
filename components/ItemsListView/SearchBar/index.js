@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Animated, View, TextInput, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 
 const SearchBar = (props) => {
   const { onSearch } = props;
   const [query, setQuery] = useState('');
+
+  const pressAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = pressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.975, 1],
+  });
+  const borderColor = pressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(0, 0, 0, 0)', 'rgba(0, 0, 0, 1)'],
+  });
 
   const onEnterQuery = (query) => {
     setQuery(query);
@@ -15,8 +25,34 @@ const SearchBar = (props) => {
     onSearch(query);
   };
 
+  const onFocus = () => {
+    Animated.spring(pressAnim, {
+      toValue: 1,
+      speed: 20,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const onBlur = () => {
+    Animated.spring(pressAnim, {
+      toValue: 0,
+      speed: 20,
+      useNativeDriver: false,
+    }).start();
+  };
+
   return (
-    <View style={styles.searchBarWrapper}>
+    <Animated.View
+      style={[
+        styles.searchBarWrapper,
+        {
+          borderColor: borderColor,
+          shadowOpacity: pressAnim,
+          shadowColor: 'rgba(0, 0, 0, 0.05)',
+          transform: [{ scale: scaleAnim }],
+        },
+      ]}
+    >
       <View style={styles.searchBarIcon}>
         <Icon size={20} type="feather" name="search" />
       </View>
@@ -28,8 +64,10 @@ const SearchBar = (props) => {
         value={query}
         onChangeText={onEnterQuery}
         selectionColor={'#000'}
+        onFocus={onFocus}
+        onBlur={onBlur}
       ></TextInput>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -43,6 +81,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     backgroundColor: 'rgb(240, 240, 240)',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowRadius: 25,
+    borderWidth: 1,
     borderRadius: 6,
   },
   searchBarInput: { fontSize: 22, marginLeft: 10, flex: 1 },
