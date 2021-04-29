@@ -11,7 +11,6 @@ import Card from '../Card';
 import { confirmDistance } from '../../constants';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const dismissTarget = SCREEN_HEIGHT + 100;
 
 const Pile = (props) => {
@@ -50,9 +49,27 @@ const Pile = (props) => {
     },
   });
 
-  const cardRotation = pan.x.interpolate({
-    inputRange: [-SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2],
+  const cardRotation = pan.y.interpolate({
+    inputRange: [-SCREEN_HEIGHT / 2, 0, SCREEN_HEIGHT / 2],
     outputRange: ['-10deg', '0deg', '10deg'],
+    extrapolate: 'clamp',
+  });
+
+  const nextCardOpacity = pan.y.interpolate({
+    inputRange: [-SCREEN_HEIGHT / 2, 0, SCREEN_HEIGHT / 2],
+    outputRange: [1, 0.5, 1],
+    extrapolate: 'clamp',
+  });
+
+  const nextCardScale = pan.y.interpolate({
+    inputRange: [-SCREEN_HEIGHT / 2, 0, SCREEN_HEIGHT / 2],
+    outputRange: [1, 0.95, 1],
+    extrapolate: 'clamp',
+  });
+
+  const nextCardTranslateY = pan.y.interpolate({
+    inputRange: [-SCREEN_HEIGHT / 2, 0, SCREEN_HEIGHT / 2],
+    outputRange: [0, 35, 0],
     extrapolate: 'clamp',
   });
 
@@ -66,6 +83,7 @@ const Pile = (props) => {
   };
 
   const showNextCard = () => {
+    pan.setValue({ x: 0, y: 0 });
     setCurrentIndex(currentIndex + 1);
   };
 
@@ -82,15 +100,27 @@ const Pile = (props) => {
     ];
   };
 
+  const getCardStyle = (i) => {
+    switch (i) {
+      case currentIndex:
+        return { transform: getTransformStyles() };
+      case currentIndex + 1:
+        return {
+          transform: [
+            { scale: nextCardScale },
+            { translateY: nextCardTranslateY },
+          ],
+          opacity: nextCardOpacity,
+        };
+    }
+  };
+
   const renderCards = () => {
     return cards
       .map((card, i) => {
         if (i < currentIndex || i > currentIndex + 1) return;
         return (
-          <Animated.View
-            style={i === currentIndex && { transform: getTransformStyles() }}
-            key={i}
-          >
+          <Animated.View style={getCardStyle(i)} key={i}>
             <Card title={card.title} subtitle={card.subtitle}></Card>
           </Animated.View>
         );
