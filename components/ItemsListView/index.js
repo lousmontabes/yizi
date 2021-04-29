@@ -35,14 +35,16 @@ const ItemsListView = (props) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = fadeAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [50, 0],
+    outputRange: [1.05, 1],
     extrapolate: 'clamp',
   });
 
   useEffect(() => {
-    Animated.spring(fadeAnim, {
+    Animated.timing(fadeAnim, {
       toValue: 1,
+      duration: 300,
       useNativeDriver: true,
+      easing: Easing.out(Easing.exp),
     }).start();
   }, []);
 
@@ -80,7 +82,7 @@ const ItemsListView = (props) => {
     <Animated.View
       style={[
         styles.container,
-        { opacity: fadeAnim, transform: [{ translateY: scaleAnim }] },
+        { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
       ]}
     >
       <SafeAreaView style={styles.panel}>
