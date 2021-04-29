@@ -14,7 +14,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 const dismissTarget = SCREEN_HEIGHT + 100;
 
 const Pile = (props) => {
-  const { cards, onStartMove, onEndMove } = props;
+  const { cards } = props;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const pan = useRef(new Animated.ValueXY()).current;
@@ -25,7 +25,6 @@ const Pile = (props) => {
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
     onPanResponderMove: (e, gestureState) => {
-      onStartMove();
       Animated.event([null, { dx: pan.x, dy: pan.y }], {
         useNativeDriver: false,
       })(e, gestureState);
@@ -33,7 +32,6 @@ const Pile = (props) => {
     onPanResponderRelease: () => {
       const y = pan.y._value;
       const d = Math.abs(y);
-      onEndMove();
 
       if (d < confirmDistance) {
         Animated.spring(pan, {
@@ -43,9 +41,6 @@ const Pile = (props) => {
       } else {
         dismissCard(y < 0);
       }
-    },
-    onPanResponderTerminate: () => {
-      onEndMove();
     },
   });
 
