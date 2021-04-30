@@ -37,4 +37,4 @@ const charcoal = {
   selection: '#000',
 };
 
-export default main;
+export default blossom;

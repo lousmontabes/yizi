@@ -17,6 +17,18 @@ import theme from '../../constants/themes';
 
 const deviceWidth = Dimensions.get('window').width;
 
+const RightHeaderButton = () => {
+  return (
+    <Icon
+      size={32}
+      type="feather"
+      name="settings"
+      color={theme.logo}
+      containerStyle={{ opacity: 1 }}
+    />
+  );
+};
+
 const EmptyState = () => {
   return (
     <>
@@ -94,11 +106,12 @@ const Main = (props) => {
   };
 
   return (
-    <>
+    <View style={styles.appContainer}>
       <Header
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
         placement="center"
         centerComponent={{ text: 'yizi', style: styles.logo }}
+        rightComponent={<RightHeaderButton />}
         containerStyle={styles.header}
       />
       {!!cards.length && <Pile cards={cards}></Pile>}
@@ -120,7 +133,10 @@ const Main = (props) => {
           onHideOthers={onHideOthers}
         />
       )}
-      <StatusBar barStyle="default" />
+      <StatusBar
+        backgroundColor={theme.background}
+        barStyle={theme.dark ? 'light-content' : 'dark-content'}
+      />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.icons}
@@ -147,6 +163,7 @@ const Main = (props) => {
             type="feather"
             name={button2.icon}
             color={theme.accent}
+            reverseColor={theme.background}
             onPress={() => {
               Haptics.impactAsync();
               button2.onPress();
@@ -154,16 +171,22 @@ const Main = (props) => {
           />
         )}
       </KeyboardAvoidingView>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  appContainer: {
+    flex: 1,
+    backgroundColor: theme.background,
+  },
   header: {
     backgroundColor: theme.background,
     justifyContent: 'space-around',
     borderBottomWidth: 0,
     paddingVertical: 20,
+    paddingHorizontal: 20,
+    marginTop: 40,
   },
   logo: {
     fontFamily: 'American Typewriter',
@@ -175,7 +198,6 @@ const styles = StyleSheet.create({
       height: 2,
     },
     textShadowRadius: 0,
-    marginTop: 20,
   },
   item: { flex: 2 },
   controls: { flex: 1 },
