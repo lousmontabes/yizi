@@ -20,8 +20,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 const ThemePreview = (props) => {
-  const { theme, selected, onPress } = props;
-  const [pressing, setPressing] = useState(false);
+  const { previewedTheme, selected, onPress } = props;
 
   const pressAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = pressAnim.interpolate({
@@ -36,7 +35,6 @@ const ThemePreview = (props) => {
       speed: 500,
       useNativeDriver: true,
     }).start();
-    setPressing(true);
   };
 
   const animatePressOut = () => {
@@ -46,7 +44,6 @@ const ThemePreview = (props) => {
       bounciness: 10,
       useNativeDriver: true,
     }).start();
-    setPressing(false);
   };
 
   return (
@@ -59,13 +56,13 @@ const ThemePreview = (props) => {
         style={[
           styles.themePreviewWrapper,
           {
-            shadowColor: theme.accent,
+            shadowColor: previewedTheme.accent,
             transform: [{ scale: scaleAnim }],
           },
         ]}
       >
         <LinearGradient
-          colors={[theme.background, theme.accent]}
+          colors={[previewedTheme.background, previewedTheme.accent]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0.5, y: 1.5 }}
           style={[
@@ -124,7 +121,7 @@ const SettingsView = (props) => {
 
   const renderThemeOption = ({ item, index }) => (
     <ThemePreview
-      theme={item}
+      previewedTheme={item}
       selected={index == selectedTheme}
       onPress={() => {
         Haptics.impactAsync();
@@ -207,6 +204,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Avenir',
     paddingHorizontal: 33,
+    color: theme.text,
   },
   themePreviewWrapper: {
     display: 'flex',
