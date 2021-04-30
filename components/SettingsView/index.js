@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-navigation';
 import { Header } from 'react-native-elements';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 
 import theme, { ink, blossom, charcoal } from '../../constants/themes';
 
@@ -70,7 +71,7 @@ const ThemePreview = (props) => {
           style={[
             styles.themePreviewGradient,
             {
-              borderColor: selected || pressing ? theme.accent : 'transparent',
+              borderColor: selected ? theme.accent : 'transparent',
             },
           ]}
         ></LinearGradient>
@@ -126,6 +127,7 @@ const SettingsView = (props) => {
       theme={item}
       selected={index == selectedTheme}
       onPress={() => {
+        Haptics.impactAsync();
         setSelectedTheme(index);
       }}
     />
