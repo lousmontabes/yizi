@@ -1,7 +1,8 @@
-const main = {
+const ink = {
   dark: false,
   background: '#FFF',
   foreground: 'rgb(240, 240, 240)',
+  searchBar: 'rgb(240, 240, 240)',
   cards: '#FFF',
   cardText: '#000',
   accent: '#000',
@@ -15,6 +16,7 @@ const blossom = {
   dark: true,
   background: '#1a1a2e',
   foreground: '#325288',
+  searchBar: '#1a1a2e',
   cards: '#325288',
   cardText: '#FFF',
   accent: '#e94560',
@@ -28,6 +30,7 @@ const charcoal = {
   dark: false,
   background: '#FFF',
   foreground: '#5b6370',
+  searchBar: '#5b6370',
   cards: '#393e46',
   cardText: '#eeeeee',
   accent: '#393e46',
@@ -37,4 +40,4 @@ const charcoal = {
   selection: '#000',
 };
 
-export default blossom;
+export default ink;

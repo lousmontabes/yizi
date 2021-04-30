@@ -98,14 +98,14 @@ const styles = StyleSheet.create({
     shadowRadius: 25,
     borderWidth: 1,
     borderRadius: 6,
-    backgroundColor: theme.foreground,
+    backgroundColor: theme.searchBar,
     color: theme.text,
   },
   searchBarInput: {
     fontSize: 22,
     marginLeft: 10,
     flex: 1,
-    backgroundColor: theme.foreground,
+    backgroundColor: theme.searchBar,
     color: theme.text,
   },
 });
