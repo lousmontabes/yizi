@@ -40,4 +40,5 @@ const charcoal = {
   selection: '#000',
 };
 
+export { ink, blossom, charcoal };
 export default ink;

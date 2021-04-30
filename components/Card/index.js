@@ -28,7 +28,7 @@ const Card = (props) => {
   const animateCardPressIn = () => {
     Animated.spring(pressAnim, {
       toValue: 1,
-      speed: 20,
+      speed: 200,
       useNativeDriver: true,
     }).start();
   };
@@ -36,8 +36,9 @@ const Card = (props) => {
   const animateCardPressOut = () => {
     Animated.spring(pressAnim, {
       toValue: 0,
+      speed: 20,
+      bounciness: 20,
       useNativeDriver: true,
-      speed: 100,
     }).start();
   };
 

@@ -13,11 +13,12 @@ import * as Haptics from 'expo-haptics';
 import Pile from '../../components/Pile';
 import CreateView from '../../components/CreateView';
 import ItemsListView from '../../components/ItemsListView';
+import Settings from '../SettingsView';
 import theme from '../../constants/themes';
 
 const deviceWidth = Dimensions.get('window').width;
 
-const RightHeaderButton = () => {
+const RightHeaderButton = (props) => {
   return (
     <Icon
       size={32}
@@ -25,6 +26,7 @@ const RightHeaderButton = () => {
       name="settings"
       color={theme.logo}
       containerStyle={{ opacity: 1 }}
+      onPress={props.onPress}
     />
   );
 };
@@ -53,8 +55,11 @@ const EmptyState = () => {
 
 const Main = (props) => {
   const { cards, refresh } = props;
+
   const [createViewVisible, setCreateViewVisible] = useState(false);
   const [listViewVisible, setListViewVisible] = useState(false);
+  const [settingsViewVisible, setSettingsViewVisible] = useState(false);
+
   const [button1, setButton1] = useState({
     show: true,
     icon: 'list',
@@ -105,13 +110,22 @@ const Main = (props) => {
     setListViewVisible(false);
   };
 
+  const showSettingsView = () => {
+    Haptics.impactAsync();
+    setSettingsViewVisible(true);
+  };
+
+  const hideSettingsView = () => {
+    setSettingsViewVisible(false);
+  };
+
   return (
     <View style={styles.appContainer}>
       <Header
         barStyle={theme.dark ? 'light-content' : 'dark-content'}
         placement="center"
         centerComponent={{ text: 'yizi', style: styles.logo }}
-        rightComponent={<RightHeaderButton />}
+        rightComponent={<RightHeaderButton onPress={showSettingsView} />}
         containerStyle={styles.header}
       />
       {!!cards.length && <Pile cards={cards}></Pile>}
@@ -128,6 +142,14 @@ const Main = (props) => {
         <ItemsListView
           cards={cards}
           hide={hideListView}
+          setButton1={setButton1}
+          setButton2={setButton2}
+          onHideOthers={onHideOthers}
+        />
+      )}
+      {settingsViewVisible && (
+        <Settings
+          hide={hideSettingsView}
           setButton1={setButton1}
           setButton2={setButton2}
           onHideOthers={onHideOthers}
